@@ -94,6 +94,24 @@ O front-end lê o arquivo `frontend/.env`, que não é versionado. Crie-o a part
 - As tabelas são criadas só pelas migrações do Flyway, em `backend/src/main/resources/db/migration`. Ninguém cria nem altera tabelas à mão.
 - O teste automático do back-end (`./mvnw test`) sobe a aplicação inteira e por isso precisa das mesmas variáveis do banco.
 
+## Ambiente de homologação
+
+O sistema está publicado para testes e demonstração no Render (plano gratuito), com o banco no Supabase.
+
+| Parte | Endereço |
+|---|---|
+| Front-end | https://barberhub-frontend.onrender.com |
+| Back-end (verificação) | https://barberhub-backend-r9zp.onrender.com/api/saude |
+
+**Atenção: o back-end hiberna após 15 minutos sem uso.** O primeiro acesso depois disso pode levar de 1 a 2 minutos. Antes de uma demonstração, abra o endereço do back-end alguns minutos antes e espere responder `{"aplicacao":"ok","banco":"ok"}`.
+
+O banco do Supabase pausa depois de cerca de 1 semana sem atividade. Se isso acontecer, é só abrir o projeto no painel do Supabase e clicar em **Restore project**.
+
+Como o ambiente é publicado:
+- O back-end roda em Docker a partir da pasta `backend`, e as variáveis `BANCO_URL`, `BANCO_USUARIO`, `BANCO_SENHA` e `CORS_ORIGENS` ficam configuradas no painel do Render (nunca no repositório).
+- O front-end é um site estático gerado da pasta `frontend`, com `VITE_API_URL` apontando para o back-end.
+- Cada push na branch publicada gera um novo deploy automático.
+
 ## Como trabalhamos
 
 - Branches: `main` guarda a versão estável entregue; `develop` reúne o trabalho da Sprint.
