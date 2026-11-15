@@ -1,20 +1,232 @@
 :root {
-  font-family: system-ui, sans-serif;
-  color-scheme: light dark;
+  --fundo-claro: #dfe2e6;
+  --fundo-medio: #b3b9c2;
+  --fundo-escuro: #8c939e;
+  --tinta: #1c2026;
+  --tinta-suave: #3d444d;
+  --tinta-rotulo: #2a3038;
+  --placeholder: #4a515b;
+  --vidro: rgba(255, 255, 255, 0.3);
+  --vidro-borda: rgba(255, 255, 255, 0.6);
+  --campo: rgba(255, 255, 255, 0.45);
+  --campo-borda: rgba(255, 255, 255, 0.7);
+  --erro: #8f1f17;
+  --erro-fundo: rgba(255, 255, 255, 0.55);
+  --sucesso: #1d5b3a;
+  font-family: "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
+  color: var(--tinta);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  min-height: 100dvh;
+  background: linear-gradient(135deg, var(--fundo-claro) 0%, var(--fundo-medio) 48%, var(--fundo-escuro) 100%);
+  background-attachment: fixed;
 }
 
-main {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 1rem;
+/* Manchas de luz e sombra atrás do vidro: é o que dá profundidade ao efeito */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+body::before {
+  left: -8vw;
+  top: -12vh;
+  width: min(520px, 70vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, rgba(255, 255, 255, 0) 70%);
+  filter: blur(30px);
+}
+
+body::after {
+  right: -10vw;
+  bottom: -14vh;
+  width: min(560px, 80vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 50% 40%, #3a4049 0%, rgba(58, 64, 73, 0) 68%);
+  filter: blur(40px);
+}
+
+.pagina {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.vidro {
+  width: 100%;
+  max-width: 440px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--vidro);
+  border: 1px solid var(--vidro-borda);
+  border-radius: 24px;
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  box-shadow: 0 24px 64px rgba(28, 32, 38, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 @media (min-width: 768px) {
-  main {
-    padding: 2rem;
+  .vidro {
+    padding: 40px;
+    gap: 28px;
   }
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.marca-icone {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--tinta);
+  color: #f4f5f7;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.texto-suave {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--tinta-suave);
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campo label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tinta-rotulo);
+}
+
+.campo input {
+  height: 48px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--tinta);
+  background: var(--campo);
+  border: 1px solid var(--campo-borda);
+  border-radius: 12px;
+}
+
+.campo input::placeholder {
+  color: var(--placeholder);
+  opacity: 1;
+}
+
+.campo input[aria-invalid="true"] {
+  border-color: var(--erro);
+}
+
+.campo-erro {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--erro);
+}
+
+.alerta {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  border-radius: 12px;
+  background: var(--erro-fundo);
+  border: 1px solid var(--erro);
+  color: var(--erro);
+}
+
+.alerta-sucesso {
+  border-color: var(--sucesso);
+  color: var(--sucesso);
+}
+
+.botao {
+  height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--tinta);
+  color: #f4f5f7;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(28, 32, 38, 0.3);
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.divisor {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.rodape-cartao {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--tinta-suave);
+}
+
+.status-servidor {
+  margin: 0;
+  font-size: 12px;
+  color: var(--tinta-suave);
+}
+
+a {
+  color: var(--tinta);
+}
+
+:focus-visible {
+  outline: 2px solid var(--tinta);
+  outline-offset: 2px;
 }
