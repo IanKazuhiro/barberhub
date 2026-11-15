@@ -12,6 +12,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class ConfiguracaoSeguranca {
@@ -24,8 +27,14 @@ public class ConfiguracaoSeguranca {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(a -> a
                 .requestMatchers("/api/saude").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/acesso/cadastro").permitAll()
                 .anyRequest().authenticated());
         return http.build();
+    }
+
+    @Bean
+    PasswordEncoder codificadorDeSenha() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean("corsConfigurationSource")
