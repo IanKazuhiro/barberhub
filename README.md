@@ -6,24 +6,31 @@ Sistema modular de gestão e agendamento para barbearias. O cliente agenda onlin
 
 ## Tecnologias
 
-- Back-end: Java com Spring Boot e JPA
-- Banco de dados: PostgreSQL
-- Front-end: React
+- Back-end: Java 25 com Spring Boot 4, JPA, Spring Security e Flyway (Maven)
+- Banco de dados: PostgreSQL 17 (Supabase em homologação)
+- Front-end: React com Vite (JavaScript)
 
 ## Estrutura do repositório
 
 ```
 barberhub/
-├── backend/     API em Spring Boot (criada no T02)
-├── frontend/    Aplicação React (criada no T02)
+├── backend/     API em Spring Boot, organizada por módulos
+├── frontend/    Aplicação React, organizada por módulos
 ├── README.md
 ├── .env.example
 └── .gitignore
 ```
 
-## Como rodar o sistema
+## Pré-requisitos
 
-> Esta seção será completada no cartão T02 (estrutura base do back-end e do front-end).
+- Java 25 (JDK). Confira com `java -version`.
+- Node.js 20.19 ou superior. Confira com `node -v`.
+- Git.
+- Um banco PostgreSQL 17: o de homologação no Supabase (peça o acesso ao responsável pelo ambiente) ou um local, como descrito abaixo.
+
+O Maven não precisa ser instalado: o projeto usa o `mvnw` da pasta `backend`.
+
+## Como rodar o sistema
 
 1. Clone o repositório:
    ```bash
@@ -31,33 +38,67 @@ barberhub/
    cd barberhub
    git checkout develop
    ```
-2. Crie o arquivo de variáveis de ambiente a partir do modelo e preencha com os seus valores:
+2. Defina as variáveis de ambiente do back-end (seção abaixo).
+3. Suba o back-end, em um terminal:
    ```bash
-   cp .env.example .env
+   cd backend
+   ./mvnw spring-boot:run
    ```
-3. Tenha um PostgreSQL rodando e um banco vazio criado (ver variáveis abaixo).
-4. Back-end: passos a definir no T02.
-5. Front-end: passos a definir no T02.
+   No Windows (PowerShell), use `.\mvnw spring-boot:run`. Espere a linha `Started BarberhubBackendApplication`. A API fica em `http://localhost:8080`.
+4. Suba o front-end, em outro terminal:
+   ```bash
+   cd frontend
+   cp .env.example .env
+   npm install
+   npm run dev
+   ```
+   No PowerShell, use `Copy-Item .env.example .env`. A aplicação abre em `http://localhost:5173`.
+5. Confira: a página inicial mostra "Servidor: ok. Banco: ok.". A rota de teste do back-end é `GET /api/saude`.
 
 ## Variáveis de ambiente
 
-Os valores reais ficam apenas no arquivo `.env`, que não é versionado. O modelo está em `.env.example`.
+### Back-end
+
+O back-end lê as variáveis do **sistema**, e não de um arquivo `.env`. O modelo com todos os nomes está em `.env.example`, na raiz.
 
 | Variável | Para que serve |
 | --- | --- |
-| `BANCO_URL` | Endereço de conexão com o PostgreSQL |
+| `BANCO_URL` | Endereço de conexão JDBC com o PostgreSQL |
 | `BANCO_USUARIO` | Usuário do banco |
 | `BANCO_SENHA` | Senha do banco |
-| `JWT_SEGREDO` | Chave usada para assinar os tokens de login |
-| `JWT_EXPIRACAO_MINUTOS` | Tempo de validade do login, em minutos |
+| `CORS_ORIGENS` | Endereços do front-end autorizados a chamar a API (opcional; padrão `http://localhost:5173`) |
+| `JWT_SEGREDO` e `JWT_EXPIRACAO_MINUTOS` | Login por token (UC02); ainda não são usadas |
 
-Os nomes podem ser ajustados no T02; quem mudar atualiza este quadro e o `.env.example` no mesmo pull request.
+Defina-as de uma destas formas:
+
+- **Windows, de forma permanente:** `Win + R`, digite `rundll32 sysdm.cpl,EditEnvironmentVariables`, crie as variáveis em "Variáveis de usuário" e reabra o terminal e o editor.
+- **PowerShell, só na janela atual:** `$env:BANCO_URL="..."` (uma linha por variável).
+- **Linux e macOS:** `export BANCO_URL="..."` no terminal ou no arquivo de perfil do shell.
+
+### Front-end
+
+O front-end lê o arquivo `frontend/.env`, que não é versionado. Crie-o a partir de `frontend/.env.example`.
+
+| Variável | Para que serve |
+| --- | --- |
+| `VITE_API_URL` | Endereço do back-end (padrão `http://localhost:8080`) |
+
+## Banco de dados
+
+- **Homologação:** projeto Supabase do grupo. Use a conexão **Session pooler** do painel, no formato JDBC: `jdbc:postgresql://HOST:5432/postgres?sslmode=require`, com o usuário no formato `postgres.CODIGO_DO_PROJETO`. A senha fica só com o responsável pelo ambiente.
+- **Local (opcional), com Docker:**
+  ```bash
+  docker run --name barberhub-banco -e POSTGRES_USER=barberhub -e POSTGRES_PASSWORD=troque_esta_senha -e POSTGRES_DB=barberhub -p 5432:5432 -d postgres:17
+  ```
+  Nesse caso: `BANCO_URL=jdbc:postgresql://localhost:5432/barberhub`, `BANCO_USUARIO=barberhub` e `BANCO_SENHA=troque_esta_senha`.
+- As tabelas são criadas só pelas migrações do Flyway, em `backend/src/main/resources/db/migration`. Ninguém cria nem altera tabelas à mão.
+- O teste automático do back-end (`./mvnw test`) sobe a aplicação inteira e por isso precisa das mesmas variáveis do banco.
 
 ## Como trabalhamos
 
 - Branches: `main` guarda a versão estável entregue; `develop` reúne o trabalho da Sprint.
 - Uma branch por cartão, criada a partir da `develop`: `feature/UC09-agendar-servico` (ou `fix/` para correção).
-- Commits pequenos, no imperativo, com o número do caso de uso: `UC09: impede agendamento duplo`.
+- Commits pequenos, no imperativo, com o número do cartão: `UC09: impede agendamento duplo`.
 - Pull request sempre para a `develop`, com a descrição do que mudou, como testar e o link do cartão. Só mescla com duas aprovações: um revisor de código e um revisor funcional.
 - Senhas, chaves e dados de conexão nunca entram no repositório.
 - Todo o projeto é escrito em português: código, tabelas, commits e documentação.
