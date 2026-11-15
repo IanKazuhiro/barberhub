@@ -28,7 +28,7 @@ public class ConfiguracaoSeguranca {
         return http.build();
     }
 
-    @Bean
+    @Bean("corsConfigurationSource")
     CorsConfigurationSource configuracaoCors(
             @Value("${barberhub.cors.origens}") List<String> origens) {
         CorsConfiguration configuracao = new CorsConfiguration();
