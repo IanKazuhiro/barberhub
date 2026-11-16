@@ -9,6 +9,7 @@ Sistema modular de gestão e agendamento para barbearias. O cliente agenda onlin
 - Back-end: Java 25 com Spring Boot 4, JPA, Spring Security e Flyway (Maven)
 - Banco de dados: PostgreSQL 17 (Supabase em homologação)
 - Front-end: React com Vite (JavaScript)
+- Estilo visual: glassmorphism com minimalismo moderno em tons de cinza (estilo base em `frontend/src/index.css`)
 
 ## Estrutura do repositório
 
@@ -53,7 +54,7 @@ O Maven não precisa ser instalado: o projeto usa o `mvnw` da pasta `backend`.
    npm run dev
    ```
    No PowerShell, use `Copy-Item .env.example .env`. A aplicação abre em `http://localhost:5173`.
-5. Confira: a página inicial mostra "Servidor: ok. Banco: ok.". A rota de teste do back-end é `GET /api/saude`.
+5. Confira: a página inicial mostra a tela de cadastro e, embaixo dela, "Servidor: ok. Banco: ok.". A rota de teste do back-end é `GET /api/saude`.
 
 ## Variáveis de ambiente
 
@@ -92,7 +93,7 @@ O front-end lê o arquivo `frontend/.env`, que não é versionado. Crie-o a part
   ```
   Nesse caso: `BANCO_URL=jdbc:postgresql://localhost:5432/barberhub`, `BANCO_USUARIO=barberhub` e `BANCO_SENHA=troque_esta_senha`.
 - As tabelas são criadas só pelas migrações do Flyway, em `backend/src/main/resources/db/migration`. Ninguém cria nem altera tabelas à mão.
-- O teste automático do back-end (`./mvnw test`) sobe a aplicação inteira e por isso precisa das mesmas variáveis do banco.
+- Os testes automáticos do back-end (`./mvnw test`) incluem os testes do cadastro, que não usam o banco, e um teste que sobe a aplicação inteira e por isso precisa das mesmas variáveis do banco.
 
 ## Ambiente de homologação
 
@@ -117,7 +118,7 @@ Como o ambiente é publicado:
 - Branches: `main` guarda a versão estável entregue; `develop` reúne o trabalho da Sprint.
 - Uma branch por cartão, criada a partir da `develop`: `feature/UC09-agendar-servico` (ou `fix/` para correção).
 - Commits pequenos, no imperativo, com o número do cartão: `UC09: impede agendamento duplo`.
-- Pull request sempre para a `develop`, com a descrição do que mudou, como testar e o link do cartão. Só mescla com duas aprovações: um revisor de código e um revisor funcional.
+- Pull request sempre para a `develop`, com a descrição do que mudou, como testar e o link do cartão. Só mescla com duas aprovações: um revisor de código e um revisor funcional. Nesta Sprint, por causa do prazo, o responsável técnico valida os pull requests.
 - Senhas, chaves e dados de conexão nunca entram no repositório.
 - Todo o projeto é escrito em português: código, tabelas, commits e documentação.
 
