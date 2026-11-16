@@ -230,3 +230,20 @@ a {
   outline: 2px solid var(--tinta);
   outline-offset: 2px;
 }
+
+.alerta a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.perfil-etiqueta {
+  align-self: flex-start;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--campo);
+  border: 1px solid var(--campo-borda);
+  color: var(--tinta-rotulo);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}

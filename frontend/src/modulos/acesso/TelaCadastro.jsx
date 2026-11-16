@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ErroDaApi } from "../../compartilhado/api/cliente";
 import Campo from "../../compartilhado/ui/Campo";
 import { cadastrar } from "./api";
+import { Link } from "react-router-dom";
 
 const VAZIO = { nome: "", email: "", telefone: "", senha: "" };
 
@@ -55,7 +56,7 @@ export default function TelaCadastro() {
 
       {conta && (
         <p className="alerta alerta-sucesso" role="status">
-          Conta criada, {conta.nome}. Em breve você poderá entrar com seu e-mail e senha.
+          Conta criada, {conta.nome}. <Link to="/entrar">Entrar agora</Link>
         </p>
       )}
       {erroGeral && (
@@ -78,7 +79,7 @@ export default function TelaCadastro() {
 
       <div className="divisor" />
       <p className="rodape-cartao">
-        Já tem conta? <a href="#entrar">Entrar</a>
+        Já tem conta? <Link to="/entrar">Entrar</Link>
       </p>
     </section>
   );
