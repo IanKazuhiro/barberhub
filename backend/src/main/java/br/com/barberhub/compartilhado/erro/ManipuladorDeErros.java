@@ -12,6 +12,8 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class ManipuladorDeErros {
@@ -52,6 +54,26 @@ public class ManipuladorDeErros {
     public ResponseEntity<ErroResposta> inesperado(Exception e) {
         log.error("Erro inesperado", e);
         return resposta(HttpStatus.INTERNAL_SERVER_ERROR, "ERRO_INTERNO", "Ocorreu um erro inesperado.");
+    }
+
+    @ExceptionHandler(NaoAutenticadoException.class)
+    public ResponseEntity<ErroResposta> naoAutenticado(NaoAutenticadoException e) {
+        return resposta(HttpStatus.UNAUTHORIZED, "NAO_AUTENTICADO", e.getMessage());
+    }
+
+    @ExceptionHandler(AcessoNegadoException.class)
+    public ResponseEntity<ErroResposta> acessoNegado(AcessoNegadoException e) {
+        return resposta(HttpStatus.FORBIDDEN, "ACESSO_NEGADO", e.getMessage());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErroResposta> rotaInexistente(NoResourceFoundException e) {
+        return resposta(HttpStatus.NOT_FOUND, "NAO_ENCONTRADO", "Recurso não encontrado.");
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErroResposta> metodoNaoPermitido(HttpRequestMethodNotSupportedException e) {
+        return resposta(HttpStatus.METHOD_NOT_ALLOWED, "METODO_NAO_PERMITIDO", "Método não permitido para este recurso.");
     }
 
     private ResponseEntity<ErroResposta> resposta(HttpStatus status, String codigo, String mensagem) {
