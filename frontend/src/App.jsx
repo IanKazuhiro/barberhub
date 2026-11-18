@@ -3,6 +3,7 @@ import TelaNaoEncontrada from "./compartilhado/ui/TelaNaoEncontrada";
 import LayoutPagina from "./compartilhado/ui/LayoutPagina";
 import LayoutAutenticado from "./modulos/acesso/LayoutAutenticado";
 import RotaProtegida from "./modulos/acesso/RotaProtegida";
+import TelaAcessos from "./modulos/acesso/TelaAcessos";
 import TelaCadastro from "./modulos/acesso/TelaCadastro";
 import TelaInicial from "./modulos/acesso/TelaInicial";
 import TelaLogin from "./modulos/acesso/TelaLogin";
@@ -19,10 +20,9 @@ export default function App() {
       <Route element={<RotaProtegida />}>
         <Route element={<LayoutAutenticado />}>
           <Route path="/inicio" element={<TelaInicial />} />
-          {/* Telas de um perfil só entram dentro de uma RotaProtegida com perfis. Exemplo (UC03):
           <Route element={<RotaProtegida perfis={["ADMINISTRADOR"]} />}>
             <Route path="/acessos" element={<TelaAcessos />} />
-          </Route> */}
+          </Route>
           <Route path="*" element={<TelaNaoEncontrada />} />
         </Route>
       </Route>
