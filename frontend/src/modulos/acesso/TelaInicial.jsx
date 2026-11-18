@@ -1,48 +1,47 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { ROTULO_PERFIL, itensDoPerfil } from "../../compartilhado/navegacao/menu";
 import { useSessao } from "./useSessao";
 
-const CONTEUDO = {
-  CLIENTE: {
-    rotulo: "Cliente",
-    texto: "Em breve você poderá agendar seus atendimentos por aqui.",
-  },
-  BARBEIRO: {
-    rotulo: "Barbeiro",
-    texto: "Em breve você verá sua agenda do dia por aqui.",
-  },
-  ADMINISTRADOR: {
-    rotulo: "Administrador",
-    texto: "Em breve você gerenciará serviços, equipe e acessos por aqui.",
-  },
-};
-
 export default function TelaInicial() {
-  const { usuario, sair } = useSessao();
-  const navigate = useNavigate();
-  const conteudo = CONTEUDO[usuario.perfil] ?? CONTEUDO.CLIENTE;
+  const { usuario } = useSessao();
   const primeiroNome = usuario.nome.split(" ")[0];
-
-  function aoSair() {
-    sair();
-    navigate("/entrar", { replace: true });
-  }
+  const atalhos = itensDoPerfil(usuario.perfil).filter((item) => item.caminho !== "/inicio");
 
   return (
-    <section className="vidro" aria-labelledby="titulo-inicio">
-      <div className="marca">
-        <span className="marca-icone" aria-hidden="true">B</span>
-        BarberHub
-      </div>
-
-      <span className="perfil-etiqueta">{conteudo.rotulo}</span>
-
-      <div>
+    <>
+      <section className="cartao" aria-labelledby="titulo-inicio">
+        <span className="perfil-etiqueta">{ROTULO_PERFIL[usuario.perfil]}</span>
         <h1 id="titulo-inicio" className="titulo">Olá, {primeiroNome}</h1>
-        <p className="texto-suave">{conteudo.texto}</p>
-      </div>
+        <p className="texto-suave">Bem-vindo ao BarberHub.</p>
+      </section>
 
-      <div className="divisor" />
-      <button type="button" className="botao" onClick={aoSair}>Sair</button>
-    </section>
+      <section className="cartao" aria-labelledby="titulo-conta">
+        <h2 id="titulo-conta" className="subtitulo">Sua conta</h2>
+        <dl className="dados">
+          <div><dt>Nome</dt><dd>{usuario.nome}</dd></div>
+          <div><dt>E-mail</dt><dd>{usuario.email}</dd></div>
+          <div><dt>Telefone</dt><dd>{usuario.telefone || "Não informado"}</dd></div>
+          <div><dt>Perfil</dt><dd>{ROTULO_PERFIL[usuario.perfil]}</dd></div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="titulo-atalhos">
+        <h2 id="titulo-atalhos" className="subtitulo">Atalhos</h2>
+        {atalhos.length === 0 ? (
+          <p className="texto-suave">
+            As funções do seu perfil aparecerão aqui conforme forem liberadas.
+          </p>
+        ) : (
+          <div className="atalhos">
+            {atalhos.map((item) => (
+              <Link key={item.caminho} to={item.caminho} className="atalho">
+                <strong>{item.rotulo}</strong>
+                <span>{item.descricao}</span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+    </>
   );
 }
