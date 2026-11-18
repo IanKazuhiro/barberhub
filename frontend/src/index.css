@@ -449,3 +449,123 @@ a {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ===== Gestão de acessos (UC03) ===== */
+.cabecalho-pagina {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.botao-pequeno {
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--tinta);
+  color: #f4f5f7;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botao-pequeno:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.botao-claro {
+  background: var(--campo);
+  color: var(--tinta);
+  border: 1px solid var(--campo-borda);
+  box-shadow: none;
+}
+
+.seletor {
+  height: 44px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--tinta);
+  background: var(--campo);
+  border: 1px solid var(--campo-borda);
+  border-radius: 12px;
+}
+
+.barra-filtro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.cartao .formulario {
+  width: 100%;
+}
+
+.acoes-formulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.lista-usuarios {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.usuario-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--vidro);
+  border: 1px solid var(--vidro-borda);
+  border-radius: 16px;
+}
+
+.usuario-dados {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.usuario-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.situacao {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--campo);
+  border: 1px solid var(--campo-borda);
+}
+
+.situacao-ativa {
+  color: var(--sucesso);
+  border-color: var(--sucesso);
+}
+
+.situacao-inativa {
+  color: var(--erro);
+  border-color: var(--erro);
+}

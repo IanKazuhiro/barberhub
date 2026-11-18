@@ -19,3 +19,15 @@ export function entrarNoSistema(dados) {
 export function buscarUsuarioAtual() {
   return requisitar("/api/acesso/eu");
 }
+
+export function listarUsuarios() {
+  return requisitar("/api/admin/usuarios");
+}
+
+export function inativarUsuario(id) {
+  return requisitar(`/api/admin/usuarios/${id}/inativar`, { method: "PATCH" });
+}
+
+export function ativarUsuario(id) {
+  return requisitar(`/api/admin/usuarios/${id}/ativar`, { method: "PATCH" });
+}

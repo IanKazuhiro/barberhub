@@ -14,6 +14,12 @@ const TODOS = ["CLIENTE", "BARBEIRO", "ADMINISTRADOR"];
  */
 export const ITENS_MENU = [
   { rotulo: "Início", caminho: "/inicio", perfis: TODOS },
+  {
+    rotulo: "Acessos",
+    caminho: "/acessos",
+    perfis: ["ADMINISTRADOR"],
+    descricao: "Crie acessos de barbeiros e inative ou reative contas.",
+  },
 ];
 
 export function itensDoPerfil(perfil) {
