@@ -28,6 +28,13 @@ export function inativarUsuario(id) {
   return requisitar(`/api/admin/usuarios/${id}/inativar`, { method: "PATCH" });
 }
 
+export function trocarPerfilDoUsuario(id, perfil) {
+  return requisitar(`/api/admin/usuarios/${id}/perfil`, {
+    method: "PATCH",
+    body: JSON.stringify({ perfil }),
+  });
+}
+
 export function ativarUsuario(id) {
   return requisitar(`/api/admin/usuarios/${id}/ativar`, { method: "PATCH" });
 }

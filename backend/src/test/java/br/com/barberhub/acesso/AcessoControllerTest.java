@@ -34,6 +34,9 @@ class AcessoControllerTest {
     @MockitoBean
     private JwtDecoder decodificador;
 
+    @MockitoBean
+    private UsuarioRepositorio usuarios;
+
     private String corpo(String email, String senha) {
         return """
             {"nome":"Ana Souza","email":"%s","telefone":"92999998888","senha":"%s"}

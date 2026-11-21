@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ErroDaApi } from "../../compartilhado/api/cliente";
 import { ROTULO_PERFIL } from "../../compartilhado/navegacao/menu";
 import FormularioNovoBarbeiro from "../barbeiro/FormularioNovoBarbeiro";
-import { ativarUsuario, inativarUsuario, listarUsuarios } from "./api";
+import { ativarUsuario, inativarUsuario, listarUsuarios, trocarPerfilDoUsuario } from "./api";
 import { useSessao } from "./useSessao";
 
 const ADMINISTRADOR_INICIAL = "admin@barberhub.local";
@@ -50,6 +50,27 @@ export default function TelaAcessos() {
       else await ativarUsuario(alvo.id);
       await recarregar();
       setAviso(inativando ? `Acesso de ${alvo.nome} inativado.` : `Acesso de ${alvo.nome} reativado.`);
+    } catch (e) {
+      setErro(mensagemDe(e));
+    } finally {
+      setEmAcao(null);
+    }
+  }
+
+  async function trocarPerfil(alvo, novoPerfil) {
+    if (novoPerfil === alvo.perfil) return;
+    if (!window.confirm(
+      `Trocar o perfil de ${alvo.nome} de ${ROTULO_PERFIL[alvo.perfil]} para ${ROTULO_PERFIL[novoPerfil]}? `
+      + "Os dados do perfil atual serão removidos.")) {
+      return;
+    }
+    setErro("");
+    setAviso("");
+    setEmAcao(alvo.id);
+    try {
+      await trocarPerfilDoUsuario(alvo.id, novoPerfil);
+      await recarregar();
+      setAviso(`Perfil de ${alvo.nome} trocado para ${ROTULO_PERFIL[novoPerfil]}.`);
     } catch (e) {
       setErro(mensagemDe(e));
     } finally {
@@ -130,12 +151,23 @@ export default function TelaAcessos() {
                       </span>
                     </div>
                   </div>
-                  {!(protegido && u.ativo) && (
-                    <button type="button" className="botao-pequeno botao-claro"
-                      disabled={emAcao === u.id} onClick={() => alternarSituacao(u)}>
-                      {u.ativo ? "Inativar" : "Reativar"}
-                    </button>
-                  )}
+                  <div className="usuario-acoes">
+                    {!protegido && (
+                      <select className="seletor seletor-pequeno" value={u.perfil}
+                        aria-label={`Perfil de ${u.nome}`} disabled={emAcao === u.id}
+                        onChange={(e) => trocarPerfil(u, e.target.value)}>
+                        {Object.entries(ROTULO_PERFIL).map(([valor, rotulo]) => (
+                          <option key={valor} value={valor}>{rotulo}</option>
+                        ))}
+                      </select>
+                    )}
+                    {!(protegido && u.ativo) && (
+                      <button type="button" className="botao-pequeno botao-claro"
+                        disabled={emAcao === u.id} onClick={() => alternarSituacao(u)}>
+                        {u.ativo ? "Inativar" : "Reativar"}
+                      </button>
+                    )}
+                  </div>
                 </li>
               );
             })}

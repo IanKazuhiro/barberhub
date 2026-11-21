@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,23 @@ class AcessoSegurancaTest {
     @MockitoBean
     private JwtDecoder decodificador;
 
+    @MockitoBean
+    private UsuarioRepositorio usuarios;
+
+    /** Token com o perfil dado; no banco a conta (id 1) existe, está ativa e tem o mesmo perfil. */
     private String tokenDe(String perfil) {
+        return tokenDe(perfil, Perfil.valueOf(perfil), true);
+    }
+
+    /** Token com um perfil e a conta no banco com outro perfil e situação: o banco é quem manda. */
+    private String tokenDe(String perfilNoToken, Perfil perfilNoBanco, boolean ativo) {
+        String perfil = perfilNoToken;
+        Usuario conta = new Usuario();
+        conta.setId(1L);
+        conta.setPerfil(perfilNoBanco);
+        conta.setAtivo(ativo);
+        when(usuarios.findById(1L)).thenReturn(Optional.of(conta));
+
         Instant agora = Instant.now();
         Jwt jwt = Jwt.withTokenValue("token-" + perfil)
                 .header("alg", "HS256")
@@ -170,6 +187,50 @@ class AcessoSegurancaTest {
                 .andExpect(status().isOk());
         mvc.perform(get("/api/cliente/teste").header("Authorization", tokenDe("CLIENTE")))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void contaInativadaDepoisDoLoginPerdeOAcessoNaHora() throws Exception {
+        mvc.perform(get("/api/acesso/eu").header("Authorization", tokenDe("CLIENTE", Perfil.CLIENTE, false)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.codigo").value("NAO_AUTENTICADO"));
+    }
+
+    @Test
+    void contaApagadaDoBancoPerdeOAcesso() throws Exception {
+        String autorizacao = tokenDe("CLIENTE");
+        when(usuarios.findById(1L)).thenReturn(Optional.empty());
+
+        mvc.perform(get("/api/acesso/eu").header("Authorization", autorizacao))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void tokenComSubjectQueNaoEhNumeroRetorna401() throws Exception {
+        Instant agora = Instant.now();
+        Jwt jwt = Jwt.withTokenValue("token-estranho")
+                .header("alg", "HS256")
+                .subject("abc")
+                .claim("perfil", "ADMINISTRADOR")
+                .issuedAt(agora)
+                .expiresAt(agora.plusSeconds(600))
+                .build();
+        when(decodificador.decode("token-estranho")).thenReturn(jwt);
+
+        mvc.perform(get("/api/admin/teste").header("Authorization", "Bearer token-estranho"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void perfilDoBancoPrevaleceSobreOPerfilDoToken() throws Exception {
+        // Foi promovido a administrador depois de gerar o token de cliente.
+        mvc.perform(get("/api/admin/teste")
+                        .header("Authorization", tokenDe("CLIENTE", Perfil.ADMINISTRADOR, true)))
+                .andExpect(status().isOk());
+        // Foi rebaixado a cliente depois de gerar o token de administrador.
+        mvc.perform(get("/api/admin/teste")
+                        .header("Authorization", tokenDe("ADMINISTRADOR", Perfil.CLIENTE, true)))
+                .andExpect(status().isForbidden());
     }
 
     @Test

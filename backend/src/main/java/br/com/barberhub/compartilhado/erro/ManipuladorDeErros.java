@@ -9,10 +9,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
@@ -27,6 +30,29 @@ public class ManipuladorDeErros {
                 .toList();
         var corpo = new ErroResposta(400, "DADOS_INVALIDOS", "Há campos inválidos.", campos, Instant.now());
         return ResponseEntity.badRequest().body(corpo);
+    }
+
+    /** Valor que não converte para o tipo esperado, ex.: ?perfil=XYZ ou /usuarios/abc/inativar. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErroResposta> parametroComTipoErrado(MethodArgumentTypeMismatchException e) {
+        var campo = new ErroResposta.CampoInvalido(e.getName(),
+                "Valor inválido para '" + e.getName() + "'.");
+        var corpo = new ErroResposta(400, "DADOS_INVALIDOS", "Há campos inválidos.", List.of(campo), Instant.now());
+        return ResponseEntity.badRequest().body(corpo);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErroResposta> parametroAusente(MissingServletRequestParameterException e) {
+        var campo = new ErroResposta.CampoInvalido(e.getParameterName(),
+                "Informe '" + e.getParameterName() + "'.");
+        var corpo = new ErroResposta(400, "DADOS_INVALIDOS", "Há campos inválidos.", List.of(campo), Instant.now());
+        return ResponseEntity.badRequest().body(corpo);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErroResposta> tipoDeConteudoNaoSuportado(HttpMediaTypeNotSupportedException e) {
+        return resposta(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "TIPO_NAO_SUPORTADO",
+                "O tipo de conteúdo enviado não é suportado. Use application/json.");
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
