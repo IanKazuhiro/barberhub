@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { ErroDaApi } from "../../compartilhado/api/cliente";
 import { ROTULO_PERFIL } from "../../compartilhado/navegacao/menu";
+import Dialogo from "../../compartilhado/ui/Dialogo";
+import Icone from "../../compartilhado/ui/Icone";
 import FormularioNovoBarbeiro from "../barbeiro/FormularioNovoBarbeiro";
 import { ativarUsuario, inativarUsuario, listarUsuarios, trocarPerfilDoUsuario } from "./api";
 import { useSessao } from "./useSessao";
@@ -22,6 +24,8 @@ export default function TelaAcessos() {
   const [filtro, setFiltro] = useState("TODOS");
   const [formularioAberto, setFormularioAberto] = useState(false);
   const [emAcao, setEmAcao] = useState(null);
+  // { tipo: "INATIVAR" | "PERFIL", alvo, novoPerfil }
+  const [confirmacao, setConfirmacao] = useState(null);
 
   useEffect(() => {
     let ativo = true;
@@ -32,24 +36,26 @@ export default function TelaAcessos() {
     return () => { ativo = false; };
   }, []);
 
+  // O aviso de sucesso sai sozinho, para não acumular mensagem na tela.
+  useEffect(() => {
+    if (!aviso) return undefined;
+    const relogio = setTimeout(() => setAviso(""), 6000);
+    return () => clearTimeout(relogio);
+  }, [aviso]);
+
   async function recarregar() {
     setUsuarios(await listarUsuarios());
   }
 
-  async function alternarSituacao(alvo) {
-    const inativando = alvo.ativo;
-    if (inativando && !window.confirm(
-      `Inativar o acesso de ${alvo.nome}? Ele não poderá mais entrar no sistema.`)) {
-      return;
-    }
+  async function alterarSituacao(alvo, ativar) {
     setErro("");
     setAviso("");
     setEmAcao(alvo.id);
     try {
-      if (inativando) await inativarUsuario(alvo.id);
-      else await ativarUsuario(alvo.id);
+      if (ativar) await ativarUsuario(alvo.id);
+      else await inativarUsuario(alvo.id);
       await recarregar();
-      setAviso(inativando ? `Acesso de ${alvo.nome} inativado.` : `Acesso de ${alvo.nome} reativado.`);
+      setAviso(ativar ? `Acesso de ${alvo.nome} reativado.` : `Acesso de ${alvo.nome} inativado.`);
     } catch (e) {
       setErro(mensagemDe(e));
     } finally {
@@ -58,12 +64,6 @@ export default function TelaAcessos() {
   }
 
   async function trocarPerfil(alvo, novoPerfil) {
-    if (novoPerfil === alvo.perfil) return;
-    if (!window.confirm(
-      `Trocar o perfil de ${alvo.nome} de ${ROTULO_PERFIL[alvo.perfil]} para ${ROTULO_PERFIL[novoPerfil]}? `
-      + "Os dados do perfil atual serão removidos.")) {
-      return;
-    }
     setErro("");
     setAviso("");
     setEmAcao(alvo.id);
@@ -76,6 +76,13 @@ export default function TelaAcessos() {
     } finally {
       setEmAcao(null);
     }
+  }
+
+  async function confirmar() {
+    const pedido = confirmacao;
+    setConfirmacao(null);
+    if (pedido.tipo === "INATIVAR") await alterarSituacao(pedido.alvo, false);
+    else await trocarPerfil(pedido.alvo, pedido.novoPerfil);
   }
 
   async function aoCriarBarbeiro(criado) {
@@ -95,12 +102,14 @@ export default function TelaAcessos() {
     <>
       <section className="cartao" aria-labelledby="titulo-acessos">
         <div className="cabecalho-pagina">
-          <div>
+          <div className="cabecalho-texto">
+            <span className="etiqueta">Acesso e perfis</span>
             <h1 id="titulo-acessos" className="titulo">Acessos</h1>
             <p className="texto-suave">Crie o acesso dos barbeiros e controle quem usa o sistema.</p>
           </div>
           {!formularioAberto && (
             <button type="button" className="botao-pequeno" onClick={() => setFormularioAberto(true)}>
+              <Icone nome="mais" tamanho={16} />
               Novo barbeiro
             </button>
           )}
@@ -132,9 +141,17 @@ export default function TelaAcessos() {
         </div>
 
         {carregando ? (
-          <p className="texto-suave">Carregando...</p>
+          <div className="esqueleto-grade" aria-hidden="true">
+            <div className="esqueleto esqueleto-linha" />
+            <div className="esqueleto esqueleto-linha" />
+            <div className="esqueleto esqueleto-linha" />
+          </div>
         ) : visiveis.length === 0 ? (
-          <p className="texto-suave">Nenhum usuário neste filtro.</p>
+          <div className="vazio">
+            <span className="vazio-icone"><Icone nome="acessos" tamanho={24} /></span>
+            <strong>Nenhum usuário neste filtro</strong>
+            <p className="texto-suave">Troque o filtro acima para ver os outros perfis.</p>
+          </div>
         ) : (
           <ul className="lista-usuarios">
             {visiveis.map((u) => {
@@ -155,7 +172,9 @@ export default function TelaAcessos() {
                     {!protegido && (
                       <select className="seletor seletor-pequeno" value={u.perfil}
                         aria-label={`Perfil de ${u.nome}`} disabled={emAcao === u.id}
-                        onChange={(e) => trocarPerfil(u, e.target.value)}>
+                        onChange={(e) => setConfirmacao({
+                          tipo: "PERFIL", alvo: u, novoPerfil: e.target.value,
+                        })}>
                         {Object.entries(ROTULO_PERFIL).map(([valor, rotulo]) => (
                           <option key={valor} value={valor}>{rotulo}</option>
                         ))}
@@ -163,8 +182,12 @@ export default function TelaAcessos() {
                     )}
                     {!(protegido && u.ativo) && (
                       <button type="button" className="botao-pequeno botao-claro"
-                        disabled={emAcao === u.id} onClick={() => alternarSituacao(u)}>
-                        {u.ativo ? "Inativar" : "Reativar"}
+                        disabled={emAcao === u.id}
+                        onClick={() => (u.ativo
+                          ? setConfirmacao({ tipo: "INATIVAR", alvo: u })
+                          : alterarSituacao(u, true))}>
+                        <Icone nome="energia" tamanho={15} />
+                        {emAcao === u.id ? "Aguarde..." : u.ativo ? "Inativar" : "Reativar"}
                       </button>
                     )}
                   </div>
@@ -174,6 +197,28 @@ export default function TelaAcessos() {
           </ul>
         )}
       </section>
+
+      {confirmacao?.tipo === "INATIVAR" && (
+        <Dialogo
+          titulo={`Inativar o acesso de ${confirmacao.alvo.nome}?`}
+          descricao="A pessoa não consegue mais entrar no sistema, e é desconectada na próxima ação. O histórico dela é preservado e você pode reativar o acesso depois."
+          rotuloConfirmar="Inativar"
+          rotuloCancelar="Manter ativo"
+          perigo
+          aoConfirmar={confirmar}
+          aoCancelar={() => setConfirmacao(null)}
+        />
+      )}
+
+      {confirmacao?.tipo === "PERFIL" && (
+        <Dialogo
+          titulo={`Trocar o perfil de ${confirmacao.alvo.nome}?`}
+          descricao={`De ${ROTULO_PERFIL[confirmacao.alvo.perfil]} para ${ROTULO_PERFIL[confirmacao.novoPerfil]}. Os dados do perfil atual são removidos, e a troca vale na próxima ação da pessoa.`}
+          rotuloConfirmar="Trocar perfil"
+          aoConfirmar={confirmar}
+          aoCancelar={() => setConfirmacao(null)}
+        />
+      )}
     </>
   );
 }
