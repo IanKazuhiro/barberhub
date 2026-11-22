@@ -23,6 +23,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Usuario {
 
+    /** Criado pela migração V8. Não pode ser inativado nem ter o perfil trocado. */
+    public static final String EMAIL_ADMINISTRADOR_INICIAL = "admin@barberhub.local";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -569,3 +569,16 @@ a {
   color: var(--erro);
   border-color: var(--erro);
 }
+
+/* ===== Ajustes pós-UC03: troca de perfil ===== */
+.usuario-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.seletor-pequeno {
+  height: 40px;
+  font-size: 14px;
+}

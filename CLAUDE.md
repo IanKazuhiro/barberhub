@@ -36,7 +36,9 @@ Sistema web responsivo de gestão e agendamento para barbearias. O cliente agend
 - `compartilhado/`: `erro/` (ManipuladorDeErros, ErroResposta, exceções), `seguranca/` (ConfiguracaoSeguranca, ConfiguracaoJwt), `auditoria/` (AuditoriaServico.registrar(usuarioId, acao, entidade, entidadeId)), `saude/`.
 - **Erros** sempre no formato `ErroResposta { status, codigo, mensagem, campos[{campo, mensagem}], momento }`:
   400 DADOS_INVALIDOS (com `campos`), 401 NAO_AUTENTICADO, 403 ACESSO_NEGADO, 404 NAO_ENCONTRADO (`RecursoNaoEncontradoException`), 409 CONFLITO, 422 REGRA_DE_NEGOCIO (`ExcecaoNegocio`).
-- Ações administrativas relevantes registram auditoria (ex.: CRIAR_BARBEIRO, INATIVAR_USUARIO, ATIVAR_USUARIO).
+- Ações administrativas relevantes registram auditoria (ex.: CRIAR_BARBEIRO, INATIVAR_USUARIO, ATIVAR_USUARIO, TROCAR_PERFIL_<PERFIL>).
+- Erros de tipo de parâmetro (`?perfil=XYZ`, id não numérico) e parâmetro ausente dão 400 DADOS_INVALIDOS com `campos`; tipo de conteúdo errado dá 415 TIPO_NAO_SUPORTADO.
+- O e-mail do administrador inicial está em `Usuario.EMAIL_ADMINISTRADOR_INICIAL` (no front, ainda repetido em `TelaAcessos.jsx`).
 
 ### Front-end: organização
 
@@ -53,12 +55,13 @@ Sistema web responsivo de gestão e agendamento para barbearias. O cliente agend
 - **RLS ligado em todas as tabelas** (V8), sem policies: a API automática do Supabase fica fechada e só o back-end acessa. Tabela nova precisa de `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` na migração.
 - Chaves estrangeiras com `ON DELETE RESTRICT`: para apagar usuário, apague antes `auditoria`, `cliente`/`barbeiro` e só depois `usuario`.
 - **Um único banco Supabase, compartilhado entre o ambiente local e o Render.** O que se apaga localmente some da homologação. Nunca apague nem altere o `admin@barberhub.local`.
-- Trocar perfil de usuário ainda não tem endpoint: é feito por SQL, ajustando junto as tabelas `cliente` e `barbeiro`. O usuário precisa entrar de novo, porque o perfil fica dentro do token.
+- Trocar perfil de usuário: `PATCH /api/admin/usuarios/{id}/perfil` (tela Acessos). O serviço `TrocaPerfilServico` remove a linha do perfil antigo (`cliente` ou `barbeiro`) e cria a do novo; se o banco recusar por histórico (agendamentos, barbeiro favorito), responde 422. Não troca o próprio perfil nem o do administrador inicial. Vale na hora: o back-end usa o perfil do banco, não o do token.
 
 ## Segurança
 
 - Senhas com BCrypt (`BCryptPasswordEncoder`, custo 10); senha de 8 a 72 caracteres; nunca devolver senha nem hash.
 - Login devolve JWT (claims `sub` = id, `perfil`, `iss` barberhub), válido por 60 min por padrão. O front guarda na sessão da aba e envia `Authorization: Bearer`.
+- **A cada requisição** o back-end busca o usuário do token no banco (`ConfiguracaoSeguranca.conversorDeToken`): conta inexistente ou inativa dá 401, e o perfil usado é o do banco, não o claim `perfil` do token. Inativar conta e trocar perfil valem na hora.
 - Autoridade `ROLE_<PERFIL>`. `/api/admin/**` só ADMINISTRADOR, `/api/barbeiro/**` só BARBEIRO, `/api/cliente/**` só CLIENTE. Sem token: 401; perfil errado: 403.
 - Login com e-mail inexistente ou senha errada dá a mesma mensagem (e compara com hash falso). Conta inativa com senha correta: 403 "Esta conta está inativa. Procure a barbearia."
 - Endpoints públicos: `GET /api/saude`, `POST /api/acesso/cadastro`, `POST /api/acesso/login`.
@@ -75,6 +78,7 @@ Sistema web responsivo de gestão e agendamento para barbearias. O cliente agend
 | GET | /api/admin/usuarios | admin | lista usuários (filtros `perfil`, `ativo`) |
 | PATCH | /api/admin/usuarios/{id}/inativar | admin | inativa conta |
 | PATCH | /api/admin/usuarios/{id}/ativar | admin | reativa conta |
+| PATCH | /api/admin/usuarios/{id}/perfil | admin | troca o perfil (corpo `{"perfil":"BARBEIRO"}`) |
 
 ## Variáveis de ambiente (back-end, lidas do sistema, não de `.env`)
 
@@ -83,10 +87,10 @@ Sistema web responsivo de gestão e agendamento para barbearias. O cliente agend
 ## Como rodar e testar
 
 - Back-end: `cd backend` e `.\mvnw spring-boot:run` (API em http://localhost:8080). Front-end: `cd frontend` e `npm run dev` (http://localhost:5173).
-- **Testes automáticos:** `.\mvnw test` (39 testes hoje). JUnit 5 + Mockito, `mock()` simples nos testes de serviço; `@WebMvcTest` + MockMvc para rotas. No Spring Boot 4 os pacotes são `org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest` e `MockitoBean`. O teste que sobe a aplicação inteira precisa das variáveis do banco e do `JWT_SEGREDO`.
+- **Testes automáticos:** `.\mvnw test` (57 testes sem Docker, mais 9 do `MigracoesBancoTest`, que só rodam com Docker ligado e senão são ignorados). JUnit 5 + Mockito, `mock()` simples nos testes de serviço; `@WebMvcTest` + MockMvc para rotas. No Spring Boot 4 os pacotes são `org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest` e `MockitoBean`. O teste que sobe a aplicação inteira precisa das variáveis do banco e do `JWT_SEGREDO`.
 - Front-end: `npm run lint` e `npm run build` sem erros antes do PR.
 - Cada cartão é verificado em quatro camadas: testes automáticos, Postman (caso certo e casos de erro, conferindo o banco), tela em homologação (um perfil por janela; janela anônima para o segundo) e lint/build.
-- Testcontainers (migrações com banco descartável) ainda não existe: pendência registrada.
+- `MigracoesBancoTest` (Testcontainers, PostgreSQL 17 descartável) aplica todas as migrações e confere tabelas, RLS ligado em todas, administrador inicial e regras do banco (horário duplo, saldo negativo, e-mail único). **Tabela nova sem RLS faz esse teste falhar.** Ele ainda não foi executado de verdade: a máquina do Ian não tem Docker instalado.
 
 ## Fluxo de trabalho de cada cartão
 
@@ -119,10 +123,8 @@ Sistema web responsivo de gestão e agendamento para barbearias. O cliente agend
 - Sprint 2 (previsão): UC17 Escala dos barbeiros, UC04 Clientes, UC09 Agendar serviço (sem horário duplo). Sprint 3: UC10, UC11, UC12, UC05.
 
 **Pendências registradas**
-- Token de conta inativada vale até expirar: checar a situação da conta a cada requisição (depois da demonstração).
-- Recuperação de senha (RF-ACE-07, Could): fora do UC02, ainda sem cartão.
-- Testcontainers para testar migrações.
-- Possível endpoint `PATCH /api/admin/usuarios/{id}/perfil` (troca de perfil), ainda não decidido.
-- README ainda diz que o UC03 está "em desenvolvimento": atualizar.
-- Banco de homologação hoje sem barbeiro ativo: criar um para a demonstração.
+- Recuperação de senha (RF-ACE-07, Could): fora do UC02, ainda sem cartão e sem decisão de como entregar o link (não há envio de e-mail no projeto).
+- Instalar o Docker e rodar `MigracoesBancoTest` pela primeira vez (hoje os 9 testes são ignorados). Se algum falhar, ajustar o teste ou a migração.
+- Banco de homologação hoje sem barbeiro ativo: criar um para a demonstração, pela tela Acessos (logado como administrador, "Novo barbeiro").
+- Front-end: o menu de quem teve o perfil trocado só atualiza ao recarregar a página (o back-end já barra na hora).
 - PRs da Sprint 1 validados só pelo Ian; voltar às duas revisões da Definition of Done quando o prazo permitir.

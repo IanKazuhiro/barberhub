@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GestaoAcessosServico {
 
-    static final String ADMINISTRADOR_INICIAL = "admin@barberhub.local";
     static final String NAO_INATIVA_A_SI_MESMO = "Você não pode inativar a sua própria conta.";
     static final String NAO_INATIVA_ADMIN_INICIAL = "A conta do administrador inicial não pode ser inativada.";
     static final String NAO_ENCONTRADO = "Usuário não encontrado.";
@@ -42,7 +41,7 @@ public class GestaoAcessosServico {
             if (usuario.getId().equals(administradorId)) {
                 throw new ExcecaoNegocio(NAO_INATIVA_A_SI_MESMO);
             }
-            if (ADMINISTRADOR_INICIAL.equalsIgnoreCase(usuario.getEmail())) {
+            if (Usuario.EMAIL_ADMINISTRADOR_INICIAL.equalsIgnoreCase(usuario.getEmail())) {
                 throw new ExcecaoNegocio(NAO_INATIVA_ADMIN_INICIAL);
             }
         }

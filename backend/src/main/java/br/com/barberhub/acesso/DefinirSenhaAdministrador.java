@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 public class DefinirSenhaAdministrador implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DefinirSenhaAdministrador.class);
-    static final String EMAIL_ADMINISTRADOR = "admin@barberhub.local";
 
     private final UsuarioRepositorio usuarios;
     private final PasswordEncoder codificador;
@@ -25,7 +24,7 @@ public class DefinirSenhaAdministrador implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        usuarios.findByEmailIgnoreCase(EMAIL_ADMINISTRADOR)
+        usuarios.findByEmailIgnoreCase(Usuario.EMAIL_ADMINISTRADOR_INICIAL)
                 .filter(admin -> admin.getSenhaHash() == null)
                 .ifPresent(admin -> {
                     if (senhaInicial == null || senhaInicial.length() < 8) {
