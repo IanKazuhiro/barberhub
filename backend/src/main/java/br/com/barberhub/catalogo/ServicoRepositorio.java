@@ -15,4 +15,8 @@ public interface ServicoRepositorio extends JpaRepository<Servico, Long> {
     List<Servico> findAllByOrderByNomeAsc();
 
     List<Servico> findByAtivoOrderByNomeAsc(boolean ativo);
+
+    List<Servico> findByEhComboTrueOrderByNomeAsc();
+
+    List<Servico> findByEhComboTrueAndAtivoOrderByNomeAsc(boolean ativo);
 }

@@ -24,10 +24,10 @@ import br.com.barberhub.compartilhado.erro.RecursoNaoEncontradoException;
 class ServicoServicoTest {
 
     private final ServicoRepositorio servicos = mock(ServicoRepositorio.class);
+    private final ComboItemRepositorio itensDeCombo = mock(ComboItemRepositorio.class);
     private final AuditoriaServico auditoria = mock(AuditoriaServico.class);
-    private final ServicoServico servico = new ServicoServico(servicos, auditoria);
+    private final ServicoServico servico = new ServicoServico(servicos, itensDeCombo, auditoria);
 
-    /** Nome com espaços nas pontas, para provar que o serviço aplica trim. */
     private static ServicoRequisicao corte() {
         return new ServicoRequisicao("  Corte masculino ", 30, new BigDecimal("40.00"));
     }
@@ -148,5 +148,23 @@ class ServicoServicoTest {
 
         assertEquals(2, servico.listar(null).size());
         assertEquals(1, servico.listar(true).size());
+    }
+
+    @Test
+    void recusaDesativarServicoDentroDeComboAtivo() {
+        when(servicos.findById(3L)).thenReturn(Optional.of(existente(3L, true)));
+        when(itensDeCombo.existeComboAtivoComServico(3L)).thenReturn(true);
+
+        assertThrows(ExcecaoNegocio.class, () -> servico.alterarSituacao(1L, 3L, false));
+        verify(servicos, never()).save(any());
+    }
+
+    @Test
+    void recusaAlterarUmCombo() {
+        Servico combo = existente(10L, true);
+        combo.setEhCombo(true);
+        when(servicos.findById(10L)).thenReturn(Optional.of(combo));
+
+        assertThrows(ExcecaoNegocio.class, () -> servico.alterar(1L, 10L, corte()));
     }
 }

@@ -17,7 +17,14 @@ public class ServicoServico {
 
     static final String NOME_REPETIDO = "Já existe um serviço com este nome.";
     static final String NAO_ENCONTRADO = "Serviço não encontrado.";
+    // Novo: impede corromper um combo pela rota de serviço simples.
+    static final String EH_COMBO = "Este item é um combo. Altere-o pela tela de combos.";
+    // Novo: impede quebrar um combo que ainda está no ar.
+    static final String EM_COMBO_ATIVO =
+            "Este serviço está em um combo ativo. Remova-o do combo ou desative o combo antes.";
+
     private final ServicoRepositorio servicos;
+    private final ComboItemRepositorio itensDeCombo;
     private final AuditoriaServico auditoria;
 
     @Transactional(readOnly = true)
@@ -45,6 +52,9 @@ public class ServicoServico {
     @Transactional
     public ServicoResposta alterar(Long administradorId, Long id, ServicoRequisicao requisicao) {
         Servico servico = buscar(id);
+        if (servico.isEhCombo()) {
+            throw new ExcecaoNegocio(EH_COMBO);
+        }
         String nome = requisicao.nome().trim();
         if (servicos.existsByNomeIgnoreCaseAndIdNot(nome, id)) {
             throw new ExcecaoNegocio(NOME_REPETIDO);
@@ -59,6 +69,9 @@ public class ServicoServico {
     @Transactional
     public ServicoResposta alterarSituacao(Long administradorId, Long id, boolean ativo) {
         Servico servico = buscar(id);
+        if (!ativo && !servico.isEhCombo() && itensDeCombo.existeComboAtivoComServico(id)) {
+            throw new ExcecaoNegocio(EM_COMBO_ATIVO);
+        }
         if (servico.isAtivo() != ativo) {
             servico.setAtivo(ativo);
             servicos.save(servico);
