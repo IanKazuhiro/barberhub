@@ -25,3 +25,21 @@ export function inativarServico(id) {
 export function ativarServico(id) {
   return requisitar(`/api/admin/servicos/${id}/ativar`, { method: "PATCH" });
 }
+
+export function listarCombos() {
+  return requisitar("/api/admin/combos");
+}
+
+export function criarCombo(dados) {
+  return requisitar("/api/admin/combos", {
+    method: "POST",
+    body: JSON.stringify(dados),
+  });
+}
+
+export function alterarCombo(id, dados) {
+  return requisitar(`/api/admin/combos/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(dados),
+  });
+}
