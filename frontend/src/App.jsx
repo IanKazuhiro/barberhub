@@ -7,6 +7,7 @@ import TelaAcessos from "./modulos/acesso/TelaAcessos";
 import TelaCadastro from "./modulos/acesso/TelaCadastro";
 import TelaInicial from "./modulos/acesso/TelaInicial";
 import TelaLogin from "./modulos/acesso/TelaLogin";
+import TelaServicos from "./modulos/catalogo/TelaServicos";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/inicio" element={<TelaInicial />} />
           <Route element={<RotaProtegida perfis={["ADMINISTRADOR"]} />}>
             <Route path="/acessos" element={<TelaAcessos />} />
+            <Route path="/servicos" element={<TelaServicos />} />
           </Route>
           <Route path="*" element={<TelaNaoEncontrada />} />
         </Route>

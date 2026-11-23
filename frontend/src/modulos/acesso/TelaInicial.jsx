@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ROTULO_PERFIL, itensDoPerfil } from "../../compartilhado/navegacao/menu";
+import Icone from "../../compartilhado/ui/Icone";
 import { useSessao } from "./useSessao";
 
 export default function TelaInicial() {
@@ -35,7 +36,11 @@ export default function TelaInicial() {
           <div className="atalhos">
             {atalhos.map((item) => (
               <Link key={item.caminho} to={item.caminho} className="atalho">
-                <strong>{item.rotulo}</strong>
+                <div className="atalho-topo">
+                  <span className="atalho-icone"><Icone nome={item.icone} tamanho={19} /></span>
+                  <strong>{item.rotulo}</strong>
+                  <span className="atalho-seta"><Icone nome="seta" tamanho={18} /></span>
+                </div>
                 <span>{item.descricao}</span>
               </Link>
             ))}
