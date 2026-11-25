@@ -1,5 +1,6 @@
 package br.com.barberhub.catalogo;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 public interface ComboItemRepositorio extends JpaRepository<ComboItem, ComboItemId> {
 
     List<ComboItem> findById_ComboId(Long comboId);
+
+    List<ComboItem> findById_ComboIdIn(Collection<Long> comboIds);
 
     @Modifying
     @Query("delete from ComboItem i where i.id.comboId = :comboId")
