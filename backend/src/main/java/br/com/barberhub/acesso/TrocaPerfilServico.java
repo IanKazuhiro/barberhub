@@ -25,7 +25,7 @@ public class TrocaPerfilServico {
     static final String NAO_TROCA_O_PROPRIO = "Você não pode trocar o seu próprio perfil.";
     static final String NAO_TROCA_ADMIN_INICIAL = "O perfil do administrador inicial não pode ser trocado.";
     static final String COM_HISTORICO = "Não foi possível trocar o perfil: este usuário já tem dados "
-            + "ligados ao perfil atual (como agendamentos ou barbeiro favorito).";
+            + "ligados ao perfil atual (como agendamentos, escala, folgas ou barbeiro favorito).";
 
     private final UsuarioRepositorio usuarios;
     private final ClienteRepositorio clientes;
