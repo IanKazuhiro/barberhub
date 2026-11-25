@@ -66,6 +66,14 @@ class EquipeServicoTest {
     }
 
     @Test
+    void listaDeAtivosNaoTrazInativo() {
+        when(usuarios.findByPerfilOrderByNomeAsc(Perfil.BARBEIRO))
+                .thenReturn(List.of(usuario(RAFAEL, "Rafael Souza", true), usuario(6L, "Tiago Lima", false)));
+
+        assertEquals(List.of(new BarbeiroAtivoResposta(RAFAEL, "Rafael Souza")), equipe.listarAtivos());
+    }
+
+    @Test
     void alteraNomeTelefoneEComissaoERegistraAuditoria() {
         Usuario rafael = usuario(RAFAEL, "Rafael", true);
         Barbeiro barbeiro = new Barbeiro(RAFAEL, BigDecimal.ZERO);

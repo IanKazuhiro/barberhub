@@ -89,6 +89,13 @@ const TRACOS = {
       <path d="M16 3v4" />
     </>
   ),
+  clientes: (
+    <>
+      <rect x="4" y="3.5" width="16" height="17" rx="2.5" />
+      <circle cx="12" cy="10" r="2.6" />
+      <path d="M7.8 17.2a4.4 4.4 0 0 1 8.4 0" />
+    </>
+  ),
   padrao: (
     <>
       <circle cx="12" cy="12" r="9" />

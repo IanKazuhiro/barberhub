@@ -43,6 +43,20 @@ export const ITENS_MENU = [
     perfis: ["ADMINISTRADOR"],
     descricao: "Defina a comissão, a escala e as folgas dos barbeiros.",
   },
+  {
+    rotulo: "Clientes",
+    caminho: "/clientes",
+    icone: "clientes",
+    perfis: ["ADMINISTRADOR", "BARBEIRO"],
+    descricao: "Busque clientes e registre preferências e observações.",
+  },
+  {
+    rotulo: "Meus dados",
+    caminho: "/meus-dados",
+    icone: "equipe",
+    perfis: ["CLIENTE"],
+    descricao: "Atualize seu nome, telefone e a opção de receber mensagens.",
+  },
 ];
 
 export function itensDoPerfil(perfil) {

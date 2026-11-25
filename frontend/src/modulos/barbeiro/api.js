@@ -43,3 +43,8 @@ export function criarFolga(id, dados) {
 export function removerFolga(id, folgaId) {
   return requisitar(`/api/admin/barbeiros/${id}/folgas/${folgaId}`, { method: "DELETE" });
 }
+
+/** Barbeiros ativos (só id e nome), para qualquer usuário logado. */
+export function listarBarbeirosAtivos() {
+  return requisitar("/api/barbeiros");
+}

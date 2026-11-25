@@ -27,6 +27,19 @@ public class Cliente {
     @Column(name = "aceita_mensagens", nullable = false)
     private boolean aceitaMensagens = true;
 
+    /** Quando a opção de receber mensagens foi dada ou alterada. */
+    @Column(name = "consentimento_em")
+    private Instant consentimentoEm;
+
+    @Column(name = "barbeiro_favorito_id")
+    private Long barbeiroFavoritoId;
+
+    @Column(name = "tipo_corte", length = 120)
+    private String tipoCorte;
+
+    @Column(columnDefinition = "text")
+    private String observacoes;
+
     @Column(name = "criado_em", nullable = false, updatable = false)
     private Instant criadoEm;
 
