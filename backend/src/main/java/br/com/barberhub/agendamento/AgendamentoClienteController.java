@@ -29,11 +29,17 @@ public class AgendamentoClienteController {
 
     private final DisponibilidadeServico disponibilidade;
     private final AgendamentoServico agendamentos;
+    private final MeusAgendamentosServico meusAgendamentos;
 
     @GetMapping("/disponibilidade")
     public List<String> horariosLivres(@RequestParam Long barbeiroId, @RequestParam Long servicoId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
         return disponibilidade.horariosLivres(barbeiroId, servicoId, data).stream().map(HORA::format).toList();
+    }
+
+    @GetMapping("/agendamentos")
+    public MeusAgendamentosResposta listar(@AuthenticationPrincipal Jwt token) {
+        return meusAgendamentos.listar(Long.valueOf(token.getSubject()));
     }
 
     @PostMapping("/agendamentos")
