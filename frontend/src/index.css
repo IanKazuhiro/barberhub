@@ -1276,3 +1276,91 @@ a {
   flex: 1;
   overflow-wrap: anywhere;
 }
+
+/* ===== Equipe, escala e folgas (UC17) ===== */
+.botao-icone {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  color: var(--tinta);
+  background: var(--campo);
+  border: 1px solid var(--campo-borda);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color var(--transicao);
+}
+
+.botao-icone:hover {
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.etiqueta-alerta {
+  color: var(--erro);
+  border-color: var(--erro);
+}
+
+.inicial-maiuscula::first-letter {
+  text-transform: uppercase;
+}
+
+.lista-cheia {
+  width: 100%;
+}
+
+.acoes-formulario .botao {
+  padding: 0 22px;
+}
+
+/* No celular, deixa o painel abaixo da barra fixa do topo ao rolar até ele. */
+.ancora-painel {
+  scroll-margin-top: 80px;
+}
+
+.escala {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.escala-dia {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--campo);
+  border: 1px solid var(--campo-borda);
+  border-radius: 14px;
+}
+
+.escala-intervalos,
+.escala-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.escala-intervalo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--tinta-suave);
+}
+
+.escala-intervalo .seletor {
+  min-width: 0;
+  padding: 0 10px;
+}
+
+@media (min-width: 900px) {
+  .escala-dia {
+    grid-template-columns: 90px 1fr auto;
+  }
+}
