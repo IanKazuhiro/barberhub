@@ -37,6 +37,13 @@ export const ITENS_MENU = [
     descricao: "Escolha serviço, barbeiro e horário e reserve seu atendimento.",
   },
   {
+    rotulo: "Meus agendamentos",
+    caminho: "/agendamentos",
+    icone: "lista",
+    perfis: ["CLIENTE"],
+    descricao: "Veja seus próximos horários e os anteriores.",
+  },
+  {
     rotulo: "Catálogo",
     caminho: "/catalogo",
     icone: "tesoura",

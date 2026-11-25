@@ -101,7 +101,7 @@ export default function TelaAgendar() {
           <div><dt>Valor</dt><dd>{MOEDA.format(confirmado.precoCobrado)}</dd></div>
         </dl>
         <div className="acoes-formulario">
-          <Link className="botao botao-link" to="/inicio">Ir para o início</Link>
+          <Link className="botao botao-link" to="/agendamentos">Ver meus agendamentos</Link>
           <button type="button" className="botao botao-claro" onClick={recomecar}>Agendar outro</button>
         </div>
       </section>

@@ -11,3 +11,8 @@ export function agendar(dados) {
     body: JSON.stringify(dados),
   });
 }
+
+/** { proximos: [...], anteriores: [...] } */
+export function listarMeusAgendamentos() {
+  return requisitar("/api/cliente/agendamentos");
+}

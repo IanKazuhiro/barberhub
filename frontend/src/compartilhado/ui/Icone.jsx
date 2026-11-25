@@ -96,6 +96,16 @@ const TRACOS = {
       <path d="M7.8 17.2a4.4 4.4 0 0 1 8.4 0" />
     </>
   ),
+  lista: (
+    <>
+      <path d="M9 6h11" />
+      <path d="M9 12h11" />
+      <path d="M9 18h11" />
+      <path d="M4.5 6h.01" />
+      <path d="M4.5 12h.01" />
+      <path d="M4.5 18h.01" />
+    </>
+  ),
   padrao: (
     <>
       <circle cx="12" cy="12" r="9" />
