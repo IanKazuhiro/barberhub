@@ -2,7 +2,7 @@
 
 Sistema modular de gestão e agendamento para barbearias. O cliente agenda online; a barbearia gerencia serviços, clientes, equipe, estoque, financeiro, assinaturas e recuperação de clientes.
 
-> Status: em construção. Projeto em Sprints de duas semanas (Scrum com quadro Kanban). Sprint 1: 11/11/2026 a 25/11/2026. Já funcionam o cadastro de clientes, o login com perfis (cliente, barbeiro e administrador), a gestão de acessos, a gestão de serviços e combos e o catálogo do cliente.
+> Status: em construção. Projeto em Sprints de duas semanas (Scrum com quadro Kanban). Sprint 1: 11/11/2026 a 25/11/2026. Já funcionam o cadastro de clientes, o login com perfis (cliente, barbeiro e administrador), a gestão de acessos, serviços e combos, equipe (comissão, escala e folgas) e clientes, o catálogo, o agendamento sem horário duplo, meus agendamentos (com cancelar e remarcar), a agenda do dia do barbeiro e o histórico do cliente.
 
 ## Tecnologias
 
@@ -63,9 +63,11 @@ O Maven não precisa ser instalado: o projeto usa o `mvnw` da pasta `backend`.
 - **Administrador inicial:** a migração do banco cria o usuário `admin@barberhub.local`, sem senha. Na primeira subida do back-end com `ADMIN_SENHA_INICIAL` definida, essa senha é gravada (apenas se ainda não existir uma). Depois disso a variável não é mais necessária.
 - **Barbeiros:** são criados pelo administrador, na tela **Acessos** (UC03), com uma senha inicial que ele repassa ao barbeiro.
 - **Gestão de acessos:** na tela **Acessos** o administrador lista usuários, inativa e reativa contas e troca o perfil de um usuário. Não é possível inativar a própria conta nem o administrador inicial.
+- **Equipe:** na tela **Equipe** o administrador define comissão, escala da semana e folgas. Barbeiro sem escala não oferece horários.
+- **Agendamento:** o cliente agenda de hoje até 30 dias à frente, em horários de 15 em 15 minutos, no fuso da barbearia. Pode cancelar ou remarcar até 2 horas antes.
 - **Sessão:** o login devolve um token com validade (60 minutos por padrão). Ao sair, ou quando o token expira, é preciso entrar novamente.
 - **Conta inativada ou perfil trocado:** valem na hora. A cada requisição o back-end confere no banco se a conta existe e está ativa, e usa o perfil atual do banco (não o do token). Conta inativada recebe 401 e a sessão é encerrada.
-- **Rotas por perfil:** `/api/admin/**` é só do administrador, `/api/barbeiro/**` só do barbeiro e `/api/cliente/**` só do cliente. Sem login a API responde 401; com perfil errado, 403.
+- **Rotas por perfil:** `/api/admin/**` é só do administrador, `/api/barbeiro/**` só do barbeiro, `/api/cliente/**` só do cliente e `/api/clientes/**` do administrador e do barbeiro. Sem login a API responde 401; com perfil errado, 403.
 
 ## Variáveis de ambiente
 
@@ -82,6 +84,7 @@ O back-end lê as variáveis do **sistema**, e não de um arquivo `.env`. O mode
 | `JWT_EXPIRACAO_MINUTOS` | Validade do token em minutos (opcional; padrão 60). Se for definida, precisa ter um número; vazia, impede o back-end de subir |
 | `ADMIN_SENHA_INICIAL` | Senha inicial do administrador (opcional; usada só quando o administrador ainda não tem senha) |
 | `CORS_ORIGENS` | Endereços do front-end autorizados a chamar a API (opcional; padrão `http://localhost:5173`) |
+| `BARBEARIA_FUSO` | Fuso da barbearia (opcional; padrão `America/Manaus`) |
 
 Defina-as de uma destas formas:
 
@@ -115,9 +118,9 @@ cd backend
 ./mvnw test
 ```
 
-- Os testes de cadastro, login, segurança por perfil e token não usam o banco.
-- Um teste sobe a aplicação inteira e por isso precisa das variáveis do banco e de `JWT_SEGREDO` definidas no mesmo terminal.
-- Testes das migrações com banco descartável (Testcontainers) ainda não existem; estão registrados como pendência.
+- A maioria dos testes (regras e rotas) não usa o banco.
+- Um teste sobe a aplicação inteira: precisa das variáveis do banco e de `JWT_SEGREDO` no mesmo terminal e **aplica as migrações no banco de `BANCO_URL`**. Com migração nova, use um PostgreSQL local.
+- `MigracoesBancoTest` aplica as migrações em um PostgreSQL descartável (Testcontainers). Precisa do Docker; sem ele, é ignorado.
 
 ## Ambiente de homologação
 
