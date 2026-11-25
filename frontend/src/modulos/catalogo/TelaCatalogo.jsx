@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { ErroDaApi } from "../../compartilhado/api/cliente";
 import Icone from "../../compartilhado/ui/Icone";
 import { consultarCatalogo } from "./api";
@@ -97,6 +98,13 @@ export default function TelaCatalogo() {
                   {item.ehCombo && <span className="etiqueta">Combo</span>}
                 </div>
                 {item.ehCombo && <p className="texto-suave">{item.itens.join(" + ")}</p>}
+                <div className="servico-acoes">
+                  <Link className="botao-pequeno botao-link" to={`/agendar?servico=${item.id}`}
+                    aria-label={`Agendar ${item.nome}`}>
+                    <Icone nome="calendario" tamanho={15} />
+                    Agendar
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
