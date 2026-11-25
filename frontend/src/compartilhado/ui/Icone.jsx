@@ -75,6 +75,20 @@ const TRACOS = {
       <path d="M18 6 6 18" />
     </>
   ),
+  equipe: (
+    <>
+      <circle cx="12" cy="7" r="3.5" />
+      <path d="M5 20v-1.5A4.5 4.5 0 0 1 9.5 14h5a4.5 4.5 0 0 1 4.5 4.5V20" />
+    </>
+  ),
+  calendario: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+      <path d="M3.5 10h17" />
+      <path d="M8 3v4" />
+      <path d="M16 3v4" />
+    </>
+  ),
   padrao: (
     <>
       <circle cx="12" cy="12" r="9" />

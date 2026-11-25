@@ -36,6 +36,13 @@ export const ITENS_MENU = [
     perfis: ["CLIENTE"],
     descricao: "Veja os serviços e combos com duração e preço.",
   },
+  {
+    rotulo: "Equipe",
+    caminho: "/equipe",
+    icone: "equipe",
+    perfis: ["ADMINISTRADOR"],
+    descricao: "Defina a comissão, a escala e as folgas dos barbeiros.",
+  },
 ];
 
 export function itensDoPerfil(perfil) {
