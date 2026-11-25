@@ -6,6 +6,7 @@ import { listarBarbeirosAtivos } from "../barbeiro/api";
 import { detalharCliente } from "./api";
 import FormularioDadosCliente from "./FormularioDadosCliente";
 import FormularioPreferencias from "./FormularioPreferencias";
+import HistoricoCliente from "./HistoricoCliente";
 
 export default function PainelCliente({ id, aoAlterar, aoFechar }) {
   const { usuario } = useSessao();
@@ -77,6 +78,8 @@ export default function PainelCliente({ id, aoAlterar, aoFechar }) {
 
       <FormularioPreferencias cliente={cliente} barbeiros={barbeiros}
         aoSalvar={(salvo) => aoSalvar(salvo, "Preferências salvas.")} />
+
+      <HistoricoCliente id={id} />
     </>
   );
 }
