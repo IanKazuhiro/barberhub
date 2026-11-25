@@ -35,7 +35,8 @@ class AgendamentoServicoTest {
 
     private final AgendamentoRepositorio agendamentos = mock(AgendamentoRepositorio.class);
     private final DisponibilidadeServico disponibilidade = mock(DisponibilidadeServico.class);
-    private final AgendamentoServico servico = new AgendamentoServico(agendamentos, disponibilidade);
+    private final PrazoServico prazo = mock(PrazoServico.class);
+    private final AgendamentoServico servico = new AgendamentoServico(agendamentos, disponibilidade, prazo);
 
     private final NovoAgendamentoRequisicao pedido = new NovoAgendamentoRequisicao(CORTE, RAFAEL, INICIO);
 

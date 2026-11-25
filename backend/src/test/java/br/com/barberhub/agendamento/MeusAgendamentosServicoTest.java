@@ -25,8 +25,9 @@ class MeusAgendamentosServicoTest {
 
     private final AgendamentoRepositorio agendamentos = mock(AgendamentoRepositorio.class);
     private final DisponibilidadeServico disponibilidade = mock(DisponibilidadeServico.class);
+    private final PrazoServico prazo = mock(PrazoServico.class);
     private final MeusAgendamentosServico servico =
-            new MeusAgendamentosServico(agendamentos, disponibilidade, Clock.fixed(AGORA, MANAUS));
+            new MeusAgendamentosServico(agendamentos, disponibilidade, prazo, Clock.fixed(AGORA, MANAUS));
 
     @BeforeEach
     void preparar() {
@@ -93,6 +94,21 @@ class MeusAgendamentosServicoTest {
         assertEquals("Corte", a.servico());
         assertEquals("Rafael Souza", a.barbeiro());
         assertEquals(EstadoAgendamento.AGENDADO, a.estado());
+    }
+
+    @Test
+    void dizOQueAindaPodeSerAlteradoEQualEhOPrazo() {
+        AgendamentoDetalhado longe = agendamento(1, Duration.ofDays(1), EstadoAgendamento.AGENDADO);
+        AgendamentoDetalhado perto = agendamento(2, Duration.ofHours(1), EstadoAgendamento.AGENDADO);
+        when(agendamentos.doCliente(CARLA)).thenReturn(List.of(longe, perto));
+        when(prazo.horasDeAntecedencia()).thenReturn(2);
+        when(prazo.podeAlterar(longe.agendamento(), 2)).thenReturn(true);
+
+        MeusAgendamentosResposta resposta = servico.listar(CARLA);
+
+        assertEquals(2, resposta.antecedenciaMinimaHoras());
+        assertEquals(List.of(false, true),
+                resposta.proximos().stream().map(AgendamentoResposta::podeAlterar).toList());
     }
 
     @Test
