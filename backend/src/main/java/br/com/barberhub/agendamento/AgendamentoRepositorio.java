@@ -39,4 +39,17 @@ public interface AgendamentoRepositorio extends JpaRepository<Agendamento, Long>
             where a.clienteId = :clienteId
             """)
     List<AgendamentoDetalhado> doCliente(@Param("clienteId") Long clienteId);
+
+    @Query("""
+            select new br.com.barberhub.agendamento.AgendamentoComCliente(
+                a, u.nome, u.telefone, c.tipoCorte, c.observacoes, s.nome)
+            from Agendamento a
+            join Usuario u on u.id = a.clienteId
+            join Cliente c on c.usuarioId = a.clienteId
+            join Servico s on s.id = a.servicoId
+            where a.barbeiroId = :barbeiroId and a.inicio >= :de and a.inicio < :ate
+            order by a.inicio, a.id
+            """)
+    List<AgendamentoComCliente> agendaDoBarbeiro(@Param("barbeiroId") Long barbeiroId, @Param("de") Instant de,
+            @Param("ate") Instant ate);
 }
