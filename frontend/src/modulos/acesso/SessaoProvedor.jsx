@@ -27,6 +27,16 @@ export default function SessaoProvedor({ children }) {
     setSessao(null);
   }, []);
 
+  /** Reflete na tela inteira uma mudança nos dados da própria conta. */
+  const atualizarUsuario = useCallback((dados) => {
+    setSessao((atual) => {
+      if (!atual) return atual;
+      const nova = { ...atual, usuario: { ...atual.usuario, ...dados } };
+      salvarSessao(nova);
+      return nova;
+    });
+  }, []);
+
   // Se o servidor recusar o token em qualquer chamada, a sessão é encerrada.
   useEffect(() => {
     definirAoSessaoExpirar(sair);
@@ -44,8 +54,8 @@ export default function SessaoProvedor({ children }) {
   }, []);
 
   const valor = useMemo(
-    () => ({ usuario: sessao?.usuario ?? null, entrar, sair }),
-    [sessao, entrar, sair],
+    () => ({ usuario: sessao?.usuario ?? null, entrar, sair, atualizarUsuario }),
+    [sessao, entrar, sair, atualizarUsuario],
   );
 
   return <SessaoContexto.Provider value={valor}>{children}</SessaoContexto.Provider>;
