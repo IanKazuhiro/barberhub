@@ -40,6 +40,14 @@ public class EquipeServico {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<BarbeiroAtivoResposta> listarAtivos() {
+        return usuarios.findByPerfilOrderByNomeAsc(Perfil.BARBEIRO).stream()
+                .filter(Usuario::isAtivo)
+                .map(u -> new BarbeiroAtivoResposta(u.getId(), u.getNome()))
+                .toList();
+    }
+
     @Transactional
     public BarbeiroResposta alterar(Long administradorId, Long id, AlterarBarbeiroRequisicao requisicao) {
         Barbeiro barbeiro = barbeiros.findById(id)

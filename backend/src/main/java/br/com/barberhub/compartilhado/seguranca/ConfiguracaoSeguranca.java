@@ -51,6 +51,7 @@ public class ConfiguracaoSeguranca {
                 .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
                 .requestMatchers("/api/barbeiro/**").hasRole("BARBEIRO")
                 .requestMatchers("/api/cliente/**").hasRole("CLIENTE")
+                .requestMatchers("/api/clientes/**").hasAnyRole("ADMINISTRADOR", "BARBEIRO")
                 .anyRequest().authenticated())
             .oauth2ResourceServer(o -> o
                 .jwt(j -> j.jwtAuthenticationConverter(conversorDeToken(usuarios)))
