@@ -43,3 +43,8 @@ export function alterarCombo(id, dados) {
     body: JSON.stringify(dados),
   });
 }
+
+/** Catálogo do cliente: só o que está ativo. */
+export function consultarCatalogo() {
+  return requisitar("/api/cliente/catalogo");
+}
