@@ -1588,3 +1588,33 @@ a {
   padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.55);
 }
+
+/* ===== Agendamentos do barbeiro inativo (UC17) ===== */
+.pendencias {
+  padding: 12px 14px;
+  font-size: 14px;
+  background: var(--erro-fundo);
+  border: 1px solid var(--erro);
+  border-radius: 12px;
+}
+
+.pendencias summary {
+  font-weight: 600;
+  color: var(--erro);
+  cursor: pointer;
+}
+
+.pendencias ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pendencias li {
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}

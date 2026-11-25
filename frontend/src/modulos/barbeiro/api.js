@@ -48,3 +48,7 @@ export function removerFolga(id, folgaId) {
 export function listarBarbeirosAtivos() {
   return requisitar("/api/barbeiros");
 }
+
+export function listarAgendamentosFuturos(id) {
+  return requisitar(`/api/admin/barbeiros/${id}/agendamentos-futuros`);
+}
