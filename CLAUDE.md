@@ -81,6 +81,12 @@ Sistema web responsivo de gestão e agendamento para barbearias. O cliente agend
 | PATCH | /api/admin/usuarios/{id}/inativar | admin | inativa conta |
 | PATCH | /api/admin/usuarios/{id}/ativar | admin | reativa conta |
 | PATCH | /api/admin/usuarios/{id}/perfil | admin | troca o perfil (corpo `{"perfil":"BARBEIRO"}`) |
+| GET, POST | /api/admin/servicos | admin | lista (filtro `ativo`) e cria serviço (201) |
+| PUT | /api/admin/servicos/{id} | admin | altera serviço simples |
+| PATCH | /api/admin/servicos/{id}/inativar e /ativar | admin | situação do serviço ou combo |
+| GET, POST | /api/admin/combos | admin | lista (filtro `ativo`) e cria combo (201) |
+| PUT | /api/admin/combos/{id} | admin | altera combo |
+| GET | /api/cliente/catalogo | cliente | serviços e combos ativos, com preço e duração |
 
 ## Variáveis de ambiente (back-end, lidas do sistema, não de `.env`)
 
@@ -89,7 +95,7 @@ Sistema web responsivo de gestão e agendamento para barbearias. O cliente agend
 ## Como rodar e testar
 
 - Back-end: `cd backend` e `.\mvnw spring-boot:run` (API em http://localhost:8080). Front-end: `cd frontend` e `npm run dev` (http://localhost:5173).
-- **Testes automáticos:** `.\mvnw test` (57 testes sem Docker, mais 9 do `MigracoesBancoTest`, que só rodam com Docker ligado e senão são ignorados). JUnit 5 + Mockito, `mock()` simples nos testes de serviço; `@WebMvcTest` + MockMvc para rotas. No Spring Boot 4 os pacotes são `org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest` e `MockitoBean`. O teste que sobe a aplicação inteira precisa das variáveis do banco e do `JWT_SEGREDO`.
+- **Testes automáticos:** `.\mvnw test` (105 testes sem Docker, mais 9 do `MigracoesBancoTest`, que só rodam com Docker ligado e senão são ignorados). JUnit 5 + Mockito, `mock()` simples nos testes de serviço; `@WebMvcTest` + MockMvc para rotas (contas fictícias em `ContasDeTeste`). No Spring Boot 4 os pacotes são `org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest` e `MockitoBean`. O teste que sobe a aplicação inteira precisa das variáveis do banco e do `JWT_SEGREDO`.
 - Front-end: `npm run lint` e `npm run build` sem erros antes do PR.
 - Cada cartão é verificado em quatro camadas: testes automáticos, Postman (caso certo e casos de erro, conferindo o banco), tela em homologação (um perfil por janela; janela anônima para o segundo) e lint/build.
 - `MigracoesBancoTest` (Testcontainers, PostgreSQL 17 descartável) aplica todas as migrações e confere tabelas, RLS ligado em todas, administrador inicial e regras do banco (horário duplo, saldo negativo, e-mail único). **Tabela nova sem RLS faz esse teste falhar.** Ele ainda não foi executado de verdade: a máquina do Ian não tem Docker instalado.
@@ -119,9 +125,8 @@ Sistema web responsivo de gestão e agendamento para barbearias. O cliente agend
 
 **Sprint 1:** 11/11 a 25/11/2026, demonstração e retrospectiva em 25/11. Meta: qualquer pessoa se cadastra e entra, o sistema reconhece o perfil e o administrador cadastra os serviços que o cliente consulta.
 
-- Concluídos (Done, mesclados na `develop` e em homologação): T01 a T04 (base técnica), T05 (navegação e telas iniciais por perfil, PR #13), UC01 Cadastrar-se (PR #9), UC02 Entrar e sair (PR #11), UC03 Gerenciar acessos (PR #14).
-- **Próximo cartão: UC06 Gerenciar serviços e combos** (RF-CAT-01, 03 e 04): administrador cadastra, altera e desativa serviços e combos, com preço e duração. Tabelas já existem: `servico` (nome único, `duracao_minutos` > 0, `preco` ≥ 0, `eh_combo`, `ativo`) e `combo_item` (combo_id, servico_id). Combo tem preço próprio (decisão da Modelagem). Se faltar tempo, o combo (RF-CAT-04) pode ser cortado.
-- Depois: UC07 Consultar catálogo (cliente vê serviços, combos e preços).
+- Concluídos (Done, mesclados na `develop` e em homologação): T01 a T04 (base técnica), T05 (navegação e telas iniciais por perfil, PR #13), UC01 Cadastrar-se (PR #9), UC02 Entrar e sair (PR #11), UC03 Gerenciar acessos (PR #14), UC06 Gerenciar serviços e combos (PR #17).
+- **Próximo cartão: UC07 Consultar catálogo** (cliente vê serviços, combos e preços).
 - Sprint 2 (previsão): UC17 Escala dos barbeiros, UC04 Clientes, UC09 Agendar serviço (sem horário duplo). Sprint 3: UC10, UC11, UC12, UC05.
 
 **Pendências registradas**

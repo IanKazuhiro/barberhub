@@ -29,6 +29,13 @@ export const ITENS_MENU = [
     perfis: ["ADMINISTRADOR"],
     descricao: "Cadastre serviços com duração e preço e desative os que saírem de linha.",
   },
+  {
+    rotulo: "Catálogo",
+    caminho: "/catalogo",
+    icone: "tesoura",
+    perfis: ["CLIENTE"],
+    descricao: "Veja os serviços e combos com duração e preço.",
+  },
 ];
 
 export function itensDoPerfil(perfil) {
