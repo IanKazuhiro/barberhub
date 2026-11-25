@@ -23,3 +23,8 @@ export function consultarMeusDados() {
 export function alterarMeusDados(dados) {
   return requisitar("/api/cliente/dados", { method: "PUT", body: JSON.stringify(dados) });
 }
+
+/** Atendimentos concluídos, do mais recente para o mais antigo. */
+export function consultarHistorico(id) {
+  return requisitar(`/api/clientes/${id}/historico`);
+}

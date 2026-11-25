@@ -1578,3 +1578,13 @@ a {
 .agenda-encerrada {
   opacity: 0.72;
 }
+
+/* ===== Histórico do cliente (UC05) ===== */
+.historico {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.55);
+}
