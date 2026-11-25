@@ -11,6 +11,8 @@ public interface EscalaBarbeiroRepositorio extends JpaRepository<EscalaBarbeiro,
 
     List<EscalaBarbeiro> findByBarbeiroIdOrderByDiaSemanaAscInicioAsc(Long barbeiroId);
 
+    List<EscalaBarbeiro> findByBarbeiroIdAndDiaSemanaOrderByInicioAsc(Long barbeiroId, short diaSemana);
+
     boolean existsByBarbeiroId(Long barbeiroId);
 
     @Query("select distinct e.barbeiroId from EscalaBarbeiro e")

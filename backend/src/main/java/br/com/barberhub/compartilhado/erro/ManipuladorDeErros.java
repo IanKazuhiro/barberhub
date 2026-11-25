@@ -70,6 +70,11 @@ public class ManipuladorDeErros {
         return resposta(HttpStatus.UNPROCESSABLE_ENTITY, "REGRA_DE_NEGOCIO", e.getMessage());
     }
 
+    @ExceptionHandler(ConflitoException.class)
+    public ResponseEntity<ErroResposta> conflitoDeNegocio(ConflitoException e) {
+        return resposta(HttpStatus.CONFLICT, "CONFLITO", e.getMessage());
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErroResposta> conflito(DataIntegrityViolationException e) {
         log.warn("Violação de integridade no banco", e);
