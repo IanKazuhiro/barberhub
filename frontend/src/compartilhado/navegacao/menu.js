@@ -41,7 +41,7 @@ export const ITENS_MENU = [
     caminho: "/agendamentos",
     icone: "lista",
     perfis: ["CLIENTE"],
-    descricao: "Veja seus próximos horários e os anteriores.",
+    descricao: "Veja seus horários, remarque ou cancele.",
   },
   {
     rotulo: "Catálogo",

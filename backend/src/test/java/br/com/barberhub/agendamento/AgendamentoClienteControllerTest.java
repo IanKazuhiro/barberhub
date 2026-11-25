@@ -6,9 +6,11 @@ import static br.com.barberhub.compartilhado.seguranca.ContasDeTeste.CLIENTE;
 import static br.com.barberhub.compartilhado.seguranca.ContasDeTeste.ID_CLIENTE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,6 +33,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import br.com.barberhub.acesso.UsuarioRepositorio;
 import br.com.barberhub.compartilhado.erro.ConflitoException;
+import br.com.barberhub.compartilhado.erro.ExcecaoNegocio;
+import br.com.barberhub.compartilhado.erro.RecursoNaoEncontradoException;
 import br.com.barberhub.compartilhado.seguranca.ConfiguracaoSeguranca;
 import br.com.barberhub.compartilhado.seguranca.ContasDeTeste;
 
@@ -55,6 +59,9 @@ class AgendamentoClienteControllerTest {
     private MeusAgendamentosServico meusAgendamentos;
 
     @MockitoBean
+    private AlteracaoAgendamentoServico alteracoes;
+
+    @MockitoBean
     private JwtDecoder decodificador;
 
     @MockitoBean
@@ -68,7 +75,7 @@ class AgendamentoClienteControllerTest {
     private static AgendamentoResposta resposta() {
         LocalDateTime inicio = LocalDateTime.of(2026, 12, 2, 10, 0);
         return new AgendamentoResposta(9L, inicio, inicio.plusMinutes(30), EstadoAgendamento.AGENDADO, 1L, "Corte",
-                5L, "Rafael Souza", new BigDecimal("45.00"));
+                5L, "Rafael Souza", new BigDecimal("45.00"), true);
     }
 
     @Test
@@ -128,7 +135,7 @@ class AgendamentoClienteControllerTest {
     @Test
     void listaSomenteOsAgendamentosDoToken() throws Exception {
         when(meusAgendamentos.listar(ID_CLIENTE))
-                .thenReturn(new MeusAgendamentosResposta(List.of(resposta()), List.of()));
+                .thenReturn(new MeusAgendamentosResposta(List.of(resposta()), List.of(), 2));
 
         mvc.perform(get(AGENDAMENTOS).header("Authorization", CLIENTE))
                 .andExpect(status().isOk())
@@ -138,6 +145,47 @@ class AgendamentoClienteControllerTest {
         mvc.perform(get(AGENDAMENTOS).header("Authorization", BARBEIRO)).andExpect(status().isForbidden());
 
         verify(meusAgendamentos).listar(ID_CLIENTE);
+    }
+
+    @Test
+    void cancelaERemarcaParaOClienteDoToken() throws Exception {
+        mvc.perform(patch(AGENDAMENTOS + "/9/cancelar").header("Authorization", CLIENTE))
+                .andExpect(status().isNoContent());
+        mvc.perform(patch(AGENDAMENTOS + "/9/remarcar").header("Authorization", CLIENTE)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"inicio\":\"2026-12-03T15:00\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(alteracoes).cancelar(ID_CLIENTE, 9L);
+        verify(alteracoes).remarcar(ID_CLIENTE, 9L, new RemarcarRequisicao(LocalDateTime.of(2026, 12, 3, 15, 0)));
+    }
+
+    @Test
+    void foraDoPrazoRetorna422EDeOutroClienteRetorna404() throws Exception {
+        doThrow(new ExcecaoNegocio("fora do prazo")).when(alteracoes).cancelar(ID_CLIENTE, 9L);
+        doThrow(new RecursoNaoEncontradoException("não encontrado")).when(alteracoes).cancelar(ID_CLIENTE, 10L);
+
+        mvc.perform(patch(AGENDAMENTOS + "/9/cancelar").header("Authorization", CLIENTE))
+                .andExpect(status().isUnprocessableEntity());
+        mvc.perform(patch(AGENDAMENTOS + "/10/cancelar").header("Authorization", CLIENTE))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void remarcarSemHorarioRetorna400() throws Exception {
+        mvc.perform(patch(AGENDAMENTOS + "/9/remarcar").header("Authorization", CLIENTE)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.campos[0].campo").value("inicio"));
+    }
+
+    @Test
+    void horariosParaRemarcarVemComHoraEMinuto() throws Exception {
+        when(alteracoes.horariosParaRemarcar(ID_CLIENTE, 9L, LocalDate.of(2026, 12, 3)))
+                .thenReturn(List.of(LocalTime.of(15, 0)));
+
+        mvc.perform(get(AGENDAMENTOS + "/9/horarios?data=2026-12-03").header("Authorization", CLIENTE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value("15:00"));
     }
 
     @Test

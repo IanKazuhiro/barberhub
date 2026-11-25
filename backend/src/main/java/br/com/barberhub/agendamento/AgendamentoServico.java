@@ -19,6 +19,7 @@ public class AgendamentoServico {
 
     private final AgendamentoRepositorio agendamentos;
     private final DisponibilidadeServico disponibilidade;
+    private final PrazoServico prazo;
 
     @Transactional
     public AgendamentoResposta agendar(Long clienteId, NovoAgendamentoRequisicao requisicao) {
@@ -41,7 +42,7 @@ public class AgendamentoServico {
 
         return new AgendamentoResposta(agendamento.getId(), inicio, disponibilidade.local(agendamento.getFim()),
                 agendamento.getEstado(), servico.getId(), servico.getNome(), barbeiro.getId(), barbeiro.getNome(),
-                agendamento.getPrecoCobrado());
+                agendamento.getPrecoCobrado(), prazo.podeAlterar(agendamento, prazo.horasDeAntecedencia()));
     }
 
     /**

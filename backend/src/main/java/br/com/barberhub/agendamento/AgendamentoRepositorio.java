@@ -2,12 +2,23 @@ package br.com.barberhub.agendamento;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import jakarta.persistence.LockModeType;
+
 public interface AgendamentoRepositorio extends JpaRepository<Agendamento, Long> {
+
+    Optional<Agendamento> findByIdAndClienteId(Long id, Long clienteId);
+
+    /** Como findByIdAndClienteId, mas trava a linha até o fim da transação. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select a from Agendamento a where a.id = :id and a.clienteId = :clienteId")
+    Optional<Agendamento> travarDoCliente(@Param("id") Long id, @Param("clienteId") Long clienteId);
 
     /** O que ocupa a agenda do barbeiro no período. Cancelado e falta não ocupam (mesma regra da RN01 no banco). */
     @Query("""

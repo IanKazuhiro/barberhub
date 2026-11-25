@@ -10,5 +10,5 @@ public record AgendamentoResposta(Long id,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime inicio,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime fim,
         EstadoAgendamento estado, Long servicoId, String servico, Long barbeiroId, String barbeiro,
-        BigDecimal precoCobrado) {
+        BigDecimal precoCobrado, boolean podeAlterar) {
 }

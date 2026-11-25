@@ -22,16 +22,19 @@ public class MeusAgendamentosServico {
 
     private final AgendamentoRepositorio agendamentos;
     private final DisponibilidadeServico disponibilidade;
+    private final PrazoServico prazo;
     private final Clock relogio;
 
     @Transactional(readOnly = true)
     public MeusAgendamentosResposta listar(Long clienteId) {
         Instant agora = relogio.instant();
+        int horas = prazo.horasDeAntecedencia();
         Map<Boolean, List<AgendamentoDetalhado>> grupos = agendamentos.doCliente(clienteId).stream()
                 .collect(Collectors.partitioningBy(d -> ehProximo(d.agendamento(), agora)));
         return new MeusAgendamentosResposta(
-                grupos.get(true).stream().sorted(POR_INICIO).map(this::paraResposta).toList(),
-                grupos.get(false).stream().sorted(POR_INICIO.reversed()).map(this::paraResposta).toList());
+                grupos.get(true).stream().sorted(POR_INICIO).map(d -> paraResposta(d, horas)).toList(),
+                grupos.get(false).stream().sorted(POR_INICIO.reversed()).map(d -> paraResposta(d, horas)).toList(),
+                horas);
     }
 
     /** Cancelado sai dos próximos mesmo com data futura; em andamento ainda conta como próximo. */
@@ -39,10 +42,10 @@ public class MeusAgendamentosServico {
         return a.getEstado() == EstadoAgendamento.AGENDADO && a.getFim().isAfter(agora);
     }
 
-    private AgendamentoResposta paraResposta(AgendamentoDetalhado d) {
+    private AgendamentoResposta paraResposta(AgendamentoDetalhado d, int horas) {
         Agendamento a = d.agendamento();
         return new AgendamentoResposta(a.getId(), disponibilidade.local(a.getInicio()),
                 disponibilidade.local(a.getFim()), a.getEstado(), a.getServicoId(), d.servico(),
-                a.getBarbeiroId(), d.barbeiro(), a.getPrecoCobrado());
+                a.getBarbeiroId(), d.barbeiro(), a.getPrecoCobrado(), prazo.podeAlterar(a, horas));
     }
 }
