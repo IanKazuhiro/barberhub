@@ -2,7 +2,7 @@
 
 Sistema modular de gestão e agendamento para barbearias. O cliente agenda online; a barbearia gerencia serviços, clientes, equipe, estoque, financeiro, assinaturas e recuperação de clientes.
 
-> Status: em construção. Projeto em Sprints de duas semanas (Scrum com quadro Kanban). Sprint 1: 11/11/2026 a 25/11/2026. Já funcionam o cadastro de clientes, o login com perfis (cliente, barbeiro e administrador) e a gestão de acessos pelo administrador.
+> Status: em construção. Projeto em Sprints de duas semanas (Scrum com quadro Kanban). Sprint 1: 11/11/2026 a 25/11/2026. Já funcionam o cadastro de clientes, o login com perfis (cliente, barbeiro e administrador), a gestão de acessos, a gestão de serviços e combos e o catálogo do cliente.
 
 ## Tecnologias
 
