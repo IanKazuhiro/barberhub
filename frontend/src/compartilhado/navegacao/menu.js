@@ -30,6 +30,13 @@ export const ITENS_MENU = [
     descricao: "Cadastre serviços com duração e preço e desative os que saírem de linha.",
   },
   {
+    rotulo: "Agendar",
+    caminho: "/agendar",
+    icone: "calendario",
+    perfis: ["CLIENTE"],
+    descricao: "Escolha serviço, barbeiro e horário e reserve seu atendimento.",
+  },
+  {
     rotulo: "Catálogo",
     caminho: "/catalogo",
     icone: "tesoura",

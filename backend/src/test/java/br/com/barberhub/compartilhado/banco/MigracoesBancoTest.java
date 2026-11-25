@@ -154,6 +154,12 @@ class MigracoesBancoTest {
     }
 
     @Test
+    void expedienteInicialTemOsSeteDiasEDomingoFechado() throws SQLException {
+        assertEquals(List.of("7"), consultar("SELECT count(*) FROM expediente_barbearia"));
+        assertEquals(List.of("0"), consultar("SELECT dia_semana FROM expediente_barbearia WHERE fechado"));
+    }
+
+    @Test
     void emailUnicoSemDiferenciarMaiusculas() throws SQLException {
         String email = UUID.randomUUID() + "@teste.com";
         executar("INSERT INTO usuario (nome, email, perfil) VALUES ('A', ?, 'CLIENTE')", email.toLowerCase());
