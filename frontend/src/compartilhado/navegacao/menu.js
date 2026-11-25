@@ -58,6 +58,13 @@ export const ITENS_MENU = [
     descricao: "Defina a comissão, a escala e as folgas dos barbeiros.",
   },
   {
+    rotulo: "Minha agenda",
+    caminho: "/agenda",
+    icone: "calendario",
+    perfis: ["BARBEIRO"],
+    descricao: "Veja quem você atende hoje e nos próximos dias.",
+  },
+  {
     rotulo: "Clientes",
     caminho: "/clientes",
     icone: "clientes",

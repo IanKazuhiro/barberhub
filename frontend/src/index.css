@@ -1544,3 +1544,37 @@ a {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ===== Agenda do dia (UC12) ===== */
+.agenda-linha {
+  align-items: flex-start;
+}
+
+.agenda-hora {
+  display: flex;
+  flex-direction: column;
+  min-width: 72px;
+}
+
+.agenda-hora strong {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.agenda-dados {
+  flex: 1 1 180px;
+}
+
+.agenda-nota {
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: pre-line;
+  background: var(--campo);
+  border: 1px solid var(--campo-borda);
+  border-radius: 10px;
+}
+
+.agenda-encerrada {
+  opacity: 0.72;
+}

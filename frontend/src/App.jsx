@@ -12,6 +12,7 @@ import TelaAgendar from "./modulos/agendamento/TelaAgendar";
 import TelaEquipe from "./modulos/barbeiro/TelaEquipe";
 import TelaMeusDados from "./modulos/cliente/TelaMeusDados";
 import TelaClientes from "./modulos/cliente/TelaClientes";
+import TelaAgenda from "./modulos/agendamento/TelaAgenda";
 import TelaCatalogo from "./modulos/catalogo/TelaCatalogo";
 import TelaServicos from "./modulos/catalogo/TelaServicos";
 
@@ -40,6 +41,9 @@ export default function App() {
           </Route>
           <Route element={<RotaProtegida perfis={["ADMINISTRADOR", "BARBEIRO"]} />}>
             <Route path="/clientes" element={<TelaClientes />} />
+          </Route>
+          <Route element={<RotaProtegida perfis={["BARBEIRO"]} />}>
+            <Route path="/agenda" element={<TelaAgenda />} />
           </Route>
           <Route path="*" element={<TelaNaoEncontrada />} />
         </Route>

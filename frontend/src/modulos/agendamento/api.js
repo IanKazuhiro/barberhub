@@ -31,3 +31,8 @@ export function remarcar(id, inicio) {
     body: JSON.stringify({ inicio }),
   });
 }
+
+/** Agenda do barbeiro logado, em ordem de horário. */
+export function consultarAgenda(data) {
+  return requisitar(`/api/barbeiro/agenda?data=${data}`);
+}
