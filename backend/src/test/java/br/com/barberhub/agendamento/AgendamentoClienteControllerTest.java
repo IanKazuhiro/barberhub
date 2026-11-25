@@ -52,6 +52,9 @@ class AgendamentoClienteControllerTest {
     private AgendamentoServico agendamentos;
 
     @MockitoBean
+    private MeusAgendamentosServico meusAgendamentos;
+
+    @MockitoBean
     private JwtDecoder decodificador;
 
     @MockitoBean
@@ -120,6 +123,21 @@ class AgendamentoClienteControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.codigo").value("CONFLITO"))
                 .andExpect(jsonPath("$.mensagem").value(DisponibilidadeServico.HORARIO_OCUPADO));
+    }
+
+    @Test
+    void listaSomenteOsAgendamentosDoToken() throws Exception {
+        when(meusAgendamentos.listar(ID_CLIENTE))
+                .thenReturn(new MeusAgendamentosResposta(List.of(resposta()), List.of()));
+
+        mvc.perform(get(AGENDAMENTOS).header("Authorization", CLIENTE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.proximos[0].servico").value("Corte"))
+                .andExpect(jsonPath("$.proximos[0].barbeiro").value("Rafael Souza"))
+                .andExpect(jsonPath("$.anteriores.length()").value(0));
+        mvc.perform(get(AGENDAMENTOS).header("Authorization", BARBEIRO)).andExpect(status().isForbidden());
+
+        verify(meusAgendamentos).listar(ID_CLIENTE);
     }
 
     @Test

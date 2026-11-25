@@ -19,4 +19,13 @@ public interface AgendamentoRepositorio extends JpaRepository<Agendamento, Long>
             """)
     List<Agendamento> ocupando(@Param("barbeiroId") Long barbeiroId, @Param("inicio") Instant inicio,
             @Param("fim") Instant fim);
+
+    @Query("""
+            select new br.com.barberhub.agendamento.AgendamentoDetalhado(a, s.nome, u.nome)
+            from Agendamento a
+            join Servico s on s.id = a.servicoId
+            join Usuario u on u.id = a.barbeiroId
+            where a.clienteId = :clienteId
+            """)
+    List<AgendamentoDetalhado> doCliente(@Param("clienteId") Long clienteId);
 }
