@@ -4,6 +4,7 @@ import Dialogo from "../../compartilhado/ui/Dialogo";
 import Icone from "../../compartilhado/ui/Icone";
 import { ativarUsuario, inativarUsuario } from "../acesso/api";
 import { listarEquipe } from "./api";
+import AgendamentosDoInativo from "./AgendamentosDoInativo";
 import EditorEscala from "./EditorEscala";
 import FormularioBarbeiro from "./FormularioBarbeiro";
 import FormularioNovoBarbeiro from "./FormularioNovoBarbeiro";
@@ -163,6 +164,7 @@ export default function TelaEquipe() {
                   <span className="etiqueta">Comissão {PERCENTUAL.format(b.percentualComissao)}%</span>
                   {!b.possuiEscala && <span className="etiqueta etiqueta-alerta">Sem escala</span>}
                 </div>
+                {!b.ativo && <AgendamentosDoInativo barbeiro={b} />}
                 <div className="servico-acoes">
                   <button type="button" className="botao-pequeno botao-claro"
                     onClick={() => setPainel({ tipo: "DADOS", barbeiro: b })}>
